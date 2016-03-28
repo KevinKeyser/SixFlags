@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SixFlags>
+  <SavedData>
+    <Departments>
+      <Department name="Mobile"/>
+      <Department name="Ped Gate"/>
+      <Department name="1"/>
+      <Department name="2"/>
+    </Departments>
+    <Names>
+    </Names>
+  </SavedData>
+  <TimeSheets>
+    <TimeSheet department="Mobile" name="Keyser" timeIn="12:30" timeOut="19:00"/>
+  </TimeSheets>
+</SixFlags>
