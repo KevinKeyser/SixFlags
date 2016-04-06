@@ -17,23 +17,23 @@ namespace SixFlags
             set { name = value; }
         }
 
-        private TimeSpan timeIn;
+        private DateTime timeIn;
 
-        public TimeSpan TimeIn
+        public DateTime TimeIn
         {
             get { return timeIn; }
             set { timeIn = value; }
         }
 
-        private TimeSpan timeOut;
+        private DateTime timeOut;
 
-        public TimeSpan TimeOut
+        public DateTime TimeOut
         {
             get { return timeOut; }
             set { timeOut = value; }
         }
 
-        public TimeSheet(string name, TimeSpan timeIn, TimeSpan timeOut)
+        public TimeSheet(string name, DateTime timeIn, DateTime timeOut)
         {
             this.name = name;
             this.timeIn = timeIn;

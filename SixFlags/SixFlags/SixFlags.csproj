@@ -46,6 +46,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CenteredMessageBox.cs" />
+    <Compile Include="CustomMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CustomMessageBox.Designer.cs">
+      <DependentUpon>CustomMessageBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Department.cs" />
+    <Compile Include="DepartmentAdd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DepartmentAdd.Designer.cs">
+      <DependentUpon>DepartmentAdd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DepartmentRemoval.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DepartmentRemoval.Designer.cs">
+      <DependentUpon>DepartmentRemoval.cs</DependentUpon>
+    </Compile>
     <Compile Include="ShiftTracker.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -67,6 +87,15 @@
     <Compile Include="TimeSheetAdder.Designer.cs">
       <DependentUpon>TimeSheetAdder.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="CustomMessageBox.resx">
+      <DependentUpon>CustomMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DepartmentAdd.resx">
+      <DependentUpon>DepartmentAdd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DepartmentRemoval.resx">
+      <DependentUpon>DepartmentRemoval.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ShiftTracker.resx">
       <DependentUpon>ShiftTracker.cs</DependentUpon>
     </EmbeddedResource>
@@ -100,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TimeSheets.xml">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
