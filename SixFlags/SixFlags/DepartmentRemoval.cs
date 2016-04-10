@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SixFlags
@@ -17,7 +10,7 @@ namespace SixFlags
         public DepartmentRemoval()
         {
             InitializeComponent();
-            foreach (Department depart in SixFlagsTracker.Departments)
+            foreach (var depart in SixFlagsTracker.Departments)
             {
                 departmentComboBox.Items.Add(depart.Name);
             }
@@ -33,7 +26,8 @@ namespace SixFlags
         {
             if (departmentComboBox.Text != "")
             {
-                if (CenteredMessageBox.Show(string.Format($"Are you sure you want to delete {departmentComboBox.Text}?"),
+                if (CenteredMessageBox.Show(
+                    string.Format($"Are you sure you want to delete {departmentComboBox.Text}?"),
                     "Deletion Dialog", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Department = departmentComboBox.Text;

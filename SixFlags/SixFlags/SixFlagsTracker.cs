@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace SixFlags
 {
@@ -21,18 +16,17 @@ namespace SixFlags
         public SixFlagsTracker()
         {
             Departments = new List<Department>();
-
-            XmlDocument document = new XmlDocument();
-            document.Load(xmlFile);
-            foreach (XmlElement department in ((XmlElement)document.GetElementsByTagName("Departments")[0]).GetElementsByTagName("Department"))
+            
+            var document = XDocument.Load(xmlFile);
+            foreach (var department in document.XPathSelectElements("SixFlags/SavedData/Departments/Department"))
             {
-                Departments.Add(new Department(department.Attributes["name"].Value));
+                Departments.Add(new Department(department.Attribute("name").Value));
             }
 
             InitializeComponent();
             foreach (TabPage TabPage in shiftTimes.TabPages)
             {
-                ShiftTracker tracker = new ShiftTracker(TabPage.Text);
+                var tracker = new ShiftTracker(TabPage.Text);
                 tracker.Dock = DockStyle.Fill;
                 TabPage.Controls.Add(tracker);
             }
@@ -40,37 +34,30 @@ namespace SixFlags
 
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DepartmentRemoval removal = new DepartmentRemoval();
+            var removal = new DepartmentRemoval();
             removal.ShowDialog();
             if (removal.DialogResult == DialogResult.Yes)
             {
-                string departmentDelete = removal.Department;
-                XmlDocument document = new XmlDocument();
-                document.Load(xmlFile);
-                XmlElement depratmentElement = document.GetElementsByTagName("Departments")[0] as XmlElement;
-                for (int i = 0; i < depratmentElement.GetElementsByTagName("Department").Count; i++)
+                var departmentDelete = removal.Department;
+                var document = XDocument.Load(xmlFile);
+                var depratmentElement = document.XPathSelectElements("SixFlags/SavedData/Departments/Department");
+                for (var i = 0; i < depratmentElement.Count(); i++)
                 {
-                    XmlElement deptElement = depratmentElement.GetElementsByTagName("Department")[i] as XmlElement;
-                    if (deptElement.Attributes["name"].Value == departmentDelete)
+                    var deptElement = depratmentElement.ElementAt(i);
+                    if (String.Compare(deptElement.Attribute("name").Value, departmentDelete, StringComparison.CurrentCultureIgnoreCase) == 0)
                     {
-                        depratmentElement.RemoveChild(deptElement);
+                        deptElement.Remove();
                         break;
                     }
                 }
-                foreach (XmlElement departmentElement in document.GetElementsByTagName("TimeSheets"))
-                {
-                    for (int i = 0; i < depratmentElement.GetElementsByTagName("Department").Count; i++)
-                    {
-                        XmlElement deptElement = depratmentElement.GetElementsByTagName("Department")[i] as XmlElement;
-                        if (deptElement.Attributes["name"].Value == departmentDelete)
-                        {
-                            depratmentElement.RemoveChild(deptElement);
-                            break;
-                        }
-                    }
-                }
+                document.XPathSelectElements("SixFlags/TimeSheets/Department")
+                    .ToList()
+                    .FindAll(element => String.Compare(element.Attribute("name").Value, departmentDelete,
+                        StringComparison.CurrentCultureIgnoreCase) == 0)
+                        .ForEach(element => element.Remove()); 
+
                 document.Save(xmlFile);
-                for (int i = 0; i < Departments.Count; i++)
+                for (var i = 0; i < Departments.Count; i++)
                 {
                     if (Departments[i].Name == departmentDelete)
                     {
@@ -83,19 +70,21 @@ namespace SixFlags
 
         private void AddEditToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DepartmentAdd add = new DepartmentAdd();
+            var add = new DepartmentAdd();
             add.ShowDialog();
             if (add.DialogResult == DialogResult.Yes)
             {
-                string departmentAdd = add.Department;
-                XmlDocument document = new XmlDocument();
-                document.Load(xmlFile);
-                XmlElement departElement = document.CreateElement("Department");
-                departElement.SetAttribute("name", departmentAdd);
-                document.GetElementsByTagName("Departments")[0].AppendChild(departElement);
-                departElement = document.CreateElement("Department");
-                departElement.SetAttribute("name", departmentAdd);
-                document.GetElementsByTagName("TimeSheets")[0].AppendChild(departElement);
+                var departmentAdd = add.Department;
+                var document = XDocument.Load(xmlFile);
+                var departElement = new XElement("Department");
+                departElement.SetAttributeValue("name", departmentAdd);
+                document.XPathSelectElement("SixFlags/SavedData/Departments").Add(departElement);
+                //departElement = document.CreateElement("Department");
+                //departElement.SetAttribute("name", departmentAdd);
+                document.XPathSelectElements("SixFlags/TimeSheets")
+                    .ToList()
+                    .ForEach(element => element.Add(departElement));
+                    
                 document.Save(xmlFile);
                 Departments.Add(new Department(departmentAdd));
             }
@@ -106,21 +95,21 @@ namespace SixFlags
             if (CenteredMessageBox.Show("Are you sure you want to delete TimeSheet data?", "TimeSheet Delete",
                 MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                XmlDocument document = new XmlDocument();
-                document.Load(xmlFile);
+                var document = XDocument.Load(xmlFile);
 
-                foreach (XmlElement departmentElement in document.GetElementsByTagName("TimeSheets"))
+                var timeSheetElement = document.XPathSelectElements("SixFlags/TimeSheets");
+                foreach (var departmentElement in timeSheetElement.Elements())
                 {
-                    for (int i = 0; i < departmentElement.GetElementsByTagName("Department").Count; i++)
-                    {
-                        XmlElement deptElement = departmentElement.GetElementsByTagName("Department")[i] as XmlElement;
-                        XmlAttribute xmlAttribute = deptElement.Attributes["name"];
-                        deptElement.RemoveAll();
-                        deptElement.Attributes.Append(xmlAttribute);
-                    }
+                    departmentElement.RemoveNodes();
                 }
                 document.Save(xmlFile);
             }
+        }
+
+        private void shiftTimes_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.Graphics.FillRectangle(Brushes.Black, e.Bounds);
+            e.Graphics.DrawString(shiftTimes.TabPages[e.Index].Text, e.Font, Brushes.White, e.Bounds.X, e.Bounds.Y);
         }
     }
 }

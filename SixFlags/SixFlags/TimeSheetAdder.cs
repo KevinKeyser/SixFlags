@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SixFlags
@@ -20,7 +13,7 @@ namespace SixFlags
             InitializeComponent();
             Department = department;
             TimeSheet = null;
-            foreach (Department depart in SixFlagsTracker.Departments)
+            foreach (var depart in SixFlagsTracker.Departments)
             {
                 departmentComboBox.Items.Add(depart.Name);
             }
@@ -38,10 +31,13 @@ namespace SixFlags
 
         private void submitButton_Click(object sender, EventArgs e)
         {
-            TimeSpan timeIn = TimeSpan.Parse(timeInPicker.Text);
-            TimeSpan timeOut = TimeSpan.Parse(timeOutPicker.Text);
-            DateTime dateIn = DateTime.Parse(dateTimePicker.Text).Subtract(-timeIn);
-            DateTime dateOut = DateTime.Parse(dateTimePicker.Text).Subtract(TimeSpan.FromDays(timeIn > timeOut ? -1 : 0)).Subtract(-timeOut);
+            var timeIn = TimeSpan.Parse(timeInPicker.Text);
+            var timeOut = TimeSpan.Parse(timeOutPicker.Text);
+            var dateIn = DateTime.Parse(dateTimePicker.Text).Subtract(-timeIn);
+            var dateOut =
+                DateTime.Parse(dateTimePicker.Text)
+                    .Subtract(TimeSpan.FromDays(timeIn > timeOut ? -1 : 0))
+                    .Subtract(-timeOut);
             DialogResult = DialogResult.Yes;
             Department = departmentComboBox.Text;
             TimeSheet = new TimeSheet(
