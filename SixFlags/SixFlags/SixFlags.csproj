@@ -54,17 +54,29 @@
       <DependentUpon>CustomMessageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Department.cs" />
+    <Compile Include="DepartmentEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DepartmentEditor.Designer.cs">
+      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="DepartmentAdd.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DepartmentAdd.Designer.cs">
       <DependentUpon>DepartmentAdd.cs</DependentUpon>
     </Compile>
-    <Compile Include="DepartmentEditor.cs">
+    <Compile Include="TimeSheetEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DepartmentEditor.Designer.cs">
-      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    <Compile Include="TimeSheetEditor.Designer.cs">
+      <DependentUpon>TimeSheetEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TimeSheetsEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TimeSheetsEditor.Designer.cs">
+      <DependentUpon>TimeSheetsEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="DepartmentRemoval.cs">
       <SubType>Form</SubType>
@@ -96,11 +108,17 @@
     <EmbeddedResource Include="CustomMessageBox.resx">
       <DependentUpon>CustomMessageBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DepartmentEditor.resx">
+      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DepartmentAdd.resx">
       <DependentUpon>DepartmentAdd.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DepartmentEditor.resx">
-      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    <EmbeddedResource Include="TimeSheetEditor.resx">
+      <DependentUpon>TimeSheetEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TimeSheetsEditor.resx">
+      <DependentUpon>TimeSheetsEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DepartmentRemoval.resx">
       <DependentUpon>DepartmentRemoval.cs</DependentUpon>
@@ -139,7 +157,7 @@
   <ItemGroup>
     <Content Include="TimeSheets.xml">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SixFlags
 {
@@ -9,6 +10,8 @@ namespace SixFlags
             Name = name;
             TimeIn = timeIn;
             TimeOut = timeOut;
+            SentLunch = new List<DateTime>();
+            SentBreak = new List<DateTime>();
         }
 
         public string Name { get; set; }
@@ -17,8 +20,8 @@ namespace SixFlags
 
         public DateTime TimeOut { get; set; }
 
-        public int SentLunch = 0;
+        public List<DateTime> SentLunch;
 
-        public int SentBreak = 0;
+        public List<DateTime> SentBreak;
     }
 }

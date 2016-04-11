@@ -100,13 +100,13 @@
             this.clearToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.timeSheetsToolStripMenuItem});
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(118, 26);
             this.clearToolStripMenuItem.Text = "Clear";
             // 
             // timeSheetsToolStripMenuItem
             // 
             this.timeSheetsToolStripMenuItem.Name = "timeSheetsToolStripMenuItem";
-            this.timeSheetsToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.timeSheetsToolStripMenuItem.Size = new System.Drawing.Size(160, 26);
             this.timeSheetsToolStripMenuItem.Text = "TimeSheets";
             this.timeSheetsToolStripMenuItem.Click += new System.EventHandler(this.clearTimeSheetsToolStripMenuItem_Click);
             // 
@@ -133,14 +133,14 @@
             this.departmentToolStripMenuItem.Name = "departmentToolStripMenuItem";
             this.departmentToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.departmentToolStripMenuItem.Text = "Add";
-            this.departmentToolStripMenuItem.Click += new System.EventHandler(this.AddEditToolStripMenuItem_Click);
+            this.departmentToolStripMenuItem.Click += new System.EventHandler(this.AddToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem1
             // 
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
             this.editToolStripMenuItem1.Size = new System.Drawing.Size(181, 26);
             this.editToolStripMenuItem1.Text = "Edit";
-            this.editToolStripMenuItem1.Click += new System.EventHandler(this.AddEditToolStripMenuItem_Click);
+            this.editToolStripMenuItem1.Click += new System.EventHandler(this.EditToolStripMenuItem_Click);
             // 
             // removeToolStripMenuItem
             // 

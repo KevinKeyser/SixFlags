@@ -32,6 +32,84 @@ namespace SixFlags
             }
         }
 
+        private void AddToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var add = new DepartmentAdd();
+            add.ShowDialog();
+            if (add.DialogResult == DialogResult.Yes)
+            {
+                var departmentAdd = add.Department;
+                var document = XDocument.Load(xmlFile);
+                var departElement = new XElement("Department");
+                departElement.SetAttributeValue("name", departmentAdd);
+                document.XPathSelectElement("SixFlags/SavedData/Departments").Add(departElement);
+                //departElement = document.CreateElement("Department");
+                //departElement.SetAttribute("name", departmentAdd);
+                document.XPathSelectElements("SixFlags/TimeSheets")
+                    .ToList()
+                    .ForEach(element => element.Add(departElement));
+
+                document.Save(xmlFile);
+                Departments.Add(new Department(departmentAdd));
+                foreach (TabPage tabPage in shiftTimes.TabPages)
+                {
+                    ShiftTracker tracker = (ShiftTracker) tabPage.Controls[0];
+                    tracker.AddDepartment(departmentAdd);
+                }
+            }
+        }
+
+        private void EditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var editor = new DepartmentEditor();
+            editor.ShowDialog();
+            if (editor.DialogResult == DialogResult.Yes)
+            {
+                var departmentAdd = editor.Department;
+                var document = XDocument.Load(xmlFile);
+                var departElement = new XElement("Department");
+                departElement.SetAttributeValue("name", departmentAdd);
+                document.XPathSelectElements("SixFlags/SavedData/Departments/Department")
+                    .ToList()
+                    .ForEach(element =>
+                    {
+                        if (element.Attribute("name").Value == editor.Department)
+                            element.SetAttributeValue("name", editor.newName);
+                    });
+
+                document.XPathSelectElements("SixFlags/TimeSheets/Department")
+                    .ToList()
+                    .ForEach(element =>
+                    {
+                        if (element.Attribute("name").Value == editor.Department)
+                            element.SetAttributeValue("name", editor.newName);
+                    });
+                document.Save(xmlFile);
+                foreach (Department department in Departments)
+                {
+                    if (String.Compare(department.Name, editor.Department, StringComparison.CurrentCultureIgnoreCase) == 0)
+                    {
+                        department.Name = editor.newName;
+                    }
+                }
+                foreach (TabPage tabPage in shiftTimes.TabPages)
+                {
+                    ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
+                    Department dept = tracker.departments[editor.Department];
+                    tracker.departments.Remove(editor.Department);
+                    tracker.departments.Add(editor.newName, dept);
+                    List<Button> buttons = tracker.Controls.OfType<Button>().ToList();
+                    foreach (Button button in buttons)
+                    {
+                        if (String.Compare(button.Text, editor.Department, StringComparison.CurrentCultureIgnoreCase) == 0)
+                        {
+                            button.Text = editor.newName;
+                        }
+                    }
+                }
+            }
+        }
+
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var removal = new DepartmentRemoval();
@@ -54,7 +132,7 @@ namespace SixFlags
                     .ToList()
                     .FindAll(element => String.Compare(element.Attribute("name").Value, departmentDelete,
                         StringComparison.CurrentCultureIgnoreCase) == 0)
-                        .ForEach(element => element.Remove()); 
+                        .ForEach(element => element.Remove());
 
                 document.Save(xmlFile);
                 for (var i = 0; i < Departments.Count; i++)
@@ -65,28 +143,20 @@ namespace SixFlags
                         break;
                     }
                 }
-            }
-        }
-
-        private void AddEditToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var add = new DepartmentAdd();
-            add.ShowDialog();
-            if (add.DialogResult == DialogResult.Yes)
-            {
-                var departmentAdd = add.Department;
-                var document = XDocument.Load(xmlFile);
-                var departElement = new XElement("Department");
-                departElement.SetAttributeValue("name", departmentAdd);
-                document.XPathSelectElement("SixFlags/SavedData/Departments").Add(departElement);
-                //departElement = document.CreateElement("Department");
-                //departElement.SetAttribute("name", departmentAdd);
-                document.XPathSelectElements("SixFlags/TimeSheets")
-                    .ToList()
-                    .ForEach(element => element.Add(departElement));
-                    
-                document.Save(xmlFile);
-                Departments.Add(new Department(departmentAdd));
+                foreach (TabPage tabPage in shiftTimes.TabPages)
+                {
+                    ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
+                    List<Button> buttons = tracker.Controls.OfType<Button>().ToList();
+                    for (int i = 0; i < buttons.Count; i++)
+                    {
+                        if (String.Compare(buttons[i].Text, departmentDelete, StringComparison.CurrentCultureIgnoreCase) == 0)
+                        {
+                            tracker.Controls.RemoveAt(i);
+                            break;
+                        }
+                    }
+                    tracker.UpdatePositioning();
+                }
             }
         }
 
@@ -103,13 +173,19 @@ namespace SixFlags
                     departmentElement.RemoveNodes();
                 }
                 document.Save(xmlFile);
+                for (int i = 0; i < Departments.Count; i++)
+                {
+                    Departments[i].timeSheets.Clear();
+                }
+                foreach (TabPage tabPage in shiftTimes.TabPages)
+                {
+                    ShiftTracker shiftTracker = (ShiftTracker) tabPage.Controls[0];
+                    foreach (string key in shiftTracker.departments.Keys)
+                    {
+                        shiftTracker.departments[key].timeSheets.Clear();
+                    }
+                }
             }
-        }
-
-        private void shiftTimes_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.Graphics.FillRectangle(Brushes.Black, e.Bounds);
-            e.Graphics.DrawString(shiftTimes.TabPages[e.Index].Text, e.Font, Brushes.White, e.Bounds.X, e.Bounds.Y);
         }
     }
 }
