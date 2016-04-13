@@ -5,13 +5,15 @@ namespace SixFlags
 {
     public partial class TimeSheetAdder : Form
     {
-        public string Department;
+        public string department;
         public TimeSheet TimeSheet;
+        private ShiftTracker tracker;
 
-        public TimeSheetAdder(string department)
+        public TimeSheetAdder(ShiftTracker tracker, string Department)
         {
             InitializeComponent();
-            Department = department;
+            department = Department;
+            this.tracker = tracker;
             TimeSheet = null;
             foreach (var depart in SixFlagsTracker.Departments)
             {
@@ -31,6 +33,20 @@ namespace SixFlags
 
         private void submitButton_Click(object sender, EventArgs e)
         {
+            if (nameTextBox.Text.Trim() == "")
+            {
+                CenteredMessageBox.Show("Enter a name", "Error", MessageBoxButtons.OK);
+                return;
+            }
+            foreach (TimeSheet timeSheet in tracker.departments[department].timeSheets)
+            {
+                if (String.Compare(timeSheet.Name.Trim(), nameTextBox.Text.Trim(),
+                        StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    CenteredMessageBox.Show("Name is already in department", "Error", MessageBoxButtons.OK);
+                    return;
+                }
+            }
             var timeIn = TimeSpan.Parse(timeInPicker.Text);
             var timeOut = TimeSpan.Parse(timeOutPicker.Text);
             var dateIn = DateTime.Parse(dateTimePicker.Text).Subtract(-timeIn);
@@ -39,7 +55,7 @@ namespace SixFlags
                     .Subtract(TimeSpan.FromDays(timeIn > timeOut ? -1 : 0))
                     .Subtract(-timeOut);
             DialogResult = DialogResult.Yes;
-            Department = departmentComboBox.Text;
+            department = departmentComboBox.Text;
             TimeSheet = new TimeSheet(
                 nameTextBox.Text,
                 dateIn,

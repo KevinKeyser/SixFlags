@@ -7,12 +7,16 @@ namespace SixFlags
     public partial class TimeSheetEditor : Form
     {
         public string oldName;
+        private Department department;
         public TimeSheet newTimeSheet;
         private List<DateTime> lunches;
         private List<DateTime> breaks;
+        private TimeSheet oldTimeSheet;
 
-        public TimeSheetEditor(TimeSheet timeSheet)
+        public TimeSheetEditor(Department department, TimeSheet timeSheet)
         {
+            this.department = department;
+            oldTimeSheet = timeSheet;
             InitializeComponent();
             oldName = timeSheet.Name;
             nameTextBox.Text = oldName;
@@ -28,10 +32,29 @@ namespace SixFlags
             dateTimePicker.Items.Add(DateTime.Today);
             dateTimePicker.Items.Add(DateTime.Today.AddDays(1));
             dateTimePicker.SelectedIndex = 0;
+
         }
 
         private void submitButton_Click(object sender, EventArgs e)
         {
+            if (nameTextBox.Text.Trim() == "")
+            {
+                CenteredMessageBox.Show("Enter a name", "Error", MessageBoxButtons.OK);
+                return;
+            }
+            foreach (TimeSheet timeSheet in department.timeSheets)
+            {
+                if (timeSheet == oldTimeSheet)
+                {
+                    continue;
+                }
+                if (String.Compare(timeSheet.Name.Trim(), nameTextBox.Text.Trim(),
+                        StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    CenteredMessageBox.Show("Name is already in department", "Error", MessageBoxButtons.OK);
+                    return;
+                }
+            }
             var timeIn = TimeSpan.Parse(timeInPicker.Text);
             var timeOut = TimeSpan.Parse(timeOutPicker.Text);
             var dateIn = DateTime.Parse(dateTimePicker.Text).Subtract(-timeIn);
@@ -43,6 +66,8 @@ namespace SixFlags
             newTimeSheet.Name = nameTextBox.Text;
             newTimeSheet.TimeIn = dateIn;
             newTimeSheet.TimeOut = dateOut;
+            newTimeSheet.SentBreak = oldTimeSheet.SentBreak;
+            newTimeSheet.SentLunch = oldTimeSheet.SentLunch;
             Close();
         }
 

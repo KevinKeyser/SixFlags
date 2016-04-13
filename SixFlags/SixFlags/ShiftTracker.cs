@@ -17,7 +17,7 @@ namespace SixFlags
     public partial class ShiftTracker : UserControl
     {
         public Dictionary<string, Department> departments;
-        private string shift;
+        public string shift;
         private List<KeyValuePair<TimeSheet, BreakType[]>> currentStatus = new List<KeyValuePair<TimeSheet, BreakType[]>>();
         ToolTip tip = new ToolTip();
         Label titleLabel = new Label();
@@ -30,7 +30,7 @@ namespace SixFlags
             BackColor = Color.Black;
             this.shift = shift;
             departments = new Dictionary<string, Department>();
-            var document = XDocument.Load(SixFlagsTracker.xmlFile);
+            var document = XDocument.Load(SixFlagsTracker.TimeSheetsFile);
 
             tip.OwnerDraw = true;
             tip.Draw += Tip_Draw;
@@ -50,29 +50,29 @@ namespace SixFlags
             {
                 AddDepartment(depart.Name);
             }
-
-            foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
+            List<XElement> timeSheets = document.XPathSelectElements("SixFlags/TimeSheets")
+                .ToList()
+                .Find(element =>
+                    (String.Compare(element.Attribute("shift").Value, shift,
+                        StringComparison.CurrentCultureIgnoreCase) == 0))
+                .Elements()
+                .ToList();
+            foreach (XElement timeSheet in timeSheets.Elements())
             {
-                if (timeSheets.Attribute("shift").Value != shift.ToLower())
+                departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Add(
+                    new TimeSheet(
+                        timeSheet.Attribute("name").Value,
+                        DateTime.Parse(timeSheet.Attribute("timeIn").Value),
+                        DateTime.Parse(timeSheet.Attribute("timeOut").Value)));
+                foreach (XElement Lunch in timeSheet.XPathSelectElements("Lunches/Lunch"))
                 {
-                    continue;
+                    departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Lunch.Attribute("time").Value));
                 }
-                foreach (var timeSheet in timeSheets.XPathSelectElements("Department/TimeSheet"))
+                foreach (XElement Break in timeSheet.XPathSelectElements("Breaks/Break"))
                 {
-                    departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Add(
-                        new TimeSheet(
-                            timeSheet.Attribute("name").Value,
-                            DateTime.Parse(timeSheet.Attribute("timeIn").Value),
-                            DateTime.Parse(timeSheet.Attribute("timeOut").Value)));
-                    foreach (XElement Lunch in timeSheet.XPathSelectElements("Lunches/Lunch"))
-                    {
-                        departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Lunch.Attribute("time").Value));
-                    }
-                    foreach (XElement Break in timeSheet.XPathSelectElements("Breaks/Break"))
-                    {
-                        departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Break.Attribute("time").Value));
-                    }
+                    departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Break.Attribute("time").Value));
                 }
+
             }
             this.Resize += ShiftTracker_Resize;
         }
@@ -101,16 +101,15 @@ namespace SixFlags
             foreach (TimeSheet timeSheet in departments[((Button)sender).Text].timeSheets)
             {
                 TimeSpan timePast = DateTime.Now - timeSheet.TimeIn;
-                if (timePast.TotalHours < 0)
-                {
-                    timePast = timePast.Subtract(-TimeSpan.FromDays(1));
-                }
+
                 List<BreakType> breakTypes = new List<BreakType>();
-                if (timePast >= TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
+                if (timePast >=
+                    TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
                 {
                     breakTypes.Add(BreakType.Lunch);
                 }
-                if (timePast >= TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
+                if (timePast >=
+                    TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
                 {
                     breakTypes.Add(BreakType.Break);
                 }
@@ -167,11 +166,6 @@ namespace SixFlags
             {
                 Brush brush;
                 TimeSpan timePast = DateTime.Now - timeSheet.Key.TimeIn;
-                if (timePast.TotalHours < 0)
-                {
-                    timePast = timePast.Subtract(-TimeSpan.FromDays(1));
-                }
-
                 if (timePast >=
                     TimeSpan.FromHours(5 * (timeSheet.Key.SentLunch.Count + 1) - .75f * timeSheet.Key.SentLunch.Count - 15 / 60f))
                 {
@@ -205,7 +199,7 @@ namespace SixFlags
         private void department_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
-            TimeSheetsEditor editor = new TimeSheetsEditor(shift, departments[button.Text]);
+            TimeSheetsEditor editor = new TimeSheetsEditor(this, shift, departments[button.Text]);
             editor.ShowDialog();
         }
 
@@ -234,13 +228,13 @@ namespace SixFlags
                 foreach (TimeSheet timeSheet in department.timeSheets)
                 {
                     TimeSpan timePast = DateTime.Now - timeSheet.TimeIn;
-                    if (timePast.TotalHours < 0)
+                    if (timePast >=
+                        TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count -
+                                           15 / 60f))
                     {
-                        timePast = timePast.Subtract(-TimeSpan.FromDays(1));
-                    }
-                    if (timePast >= TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count - 15 / 60f))
-                    {
-                        if (timePast >= TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count - 1 / 6f))
+                        if (timePast >=
+                            TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count -
+                                               1 / 6f))
                         {
                             //More Annoying Alarm
                         }
@@ -251,9 +245,13 @@ namespace SixFlags
                         departmentButton.BackColor = Color.Red;
                         break;
                     }
-                    else if (timePast >= TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) - .75f * timeSheet.SentLunch.Count - 15 / 60f))
+                    else if (timePast >=
+                             TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) -
+                                                .75f * timeSheet.SentLunch.Count - 15 / 60f))
                     {
-                        if (timePast >= TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) - .75f * timeSheet.SentLunch.Count - 1 / 6f))
+                        if (timePast >=
+                            TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) -
+                                               .75f * timeSheet.SentLunch.Count - 1 / 6f))
                         {
                             //More Annoying Alarm
                         }
@@ -264,11 +262,15 @@ namespace SixFlags
                         departmentButton.BackColor = Color.Red;
                         break;
                     }
-                    else if (timePast >= TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
+                    else if (timePast >=
+                             TimeSpan.FromHours(5 * (timeSheet.SentLunch.Count + 1) -
+                                                .75f * timeSheet.SentLunch.Count - 1))
                     {
                         departmentButton.BackColor = Color.Yellow;
                     }
-                    else if (timePast >= TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) - .75f * timeSheet.SentLunch.Count - 1))
+                    else if (timePast >=
+                             TimeSpan.FromHours(3.75f * (timeSheet.SentBreak.Count + 1) -
+                                                .75f * timeSheet.SentLunch.Count - 1))
                     {
                         departmentButton.BackColor = Color.Yellow;
                     }

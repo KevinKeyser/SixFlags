@@ -36,6 +36,7 @@
             this.sendLunchButton = new System.Windows.Forms.Button();
             this.sendBreakButton = new System.Windows.Forms.Button();
             this.timer = new System.Windows.Forms.Timer(this.components);
+            this.endShiftButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // timeSheetListBox
@@ -45,7 +46,7 @@
             this.timeSheetListBox.ItemHeight = 16;
             this.timeSheetListBox.Location = new System.Drawing.Point(0, 0);
             this.timeSheetListBox.Name = "timeSheetListBox";
-            this.timeSheetListBox.Size = new System.Drawing.Size(232, 165);
+            this.timeSheetListBox.Size = new System.Drawing.Size(232, 191);
             this.timeSheetListBox.TabIndex = 0;
             // 
             // addButton
@@ -104,11 +105,22 @@
             this.timer.Interval = 1;
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
+            // endShiftButton
+            // 
+            this.endShiftButton.Location = new System.Drawing.Point(252, 157);
+            this.endShiftButton.Name = "endShiftButton";
+            this.endShiftButton.Size = new System.Drawing.Size(140, 23);
+            this.endShiftButton.TabIndex = 6;
+            this.endShiftButton.Text = "End Shift";
+            this.endShiftButton.UseVisualStyleBackColor = true;
+            this.endShiftButton.Click += new System.EventHandler(this.endShiftButton_Click);
+            // 
             // TimeSheetsEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 165);
+            this.ClientSize = new System.Drawing.Size(404, 191);
+            this.Controls.Add(this.endShiftButton);
             this.Controls.Add(this.sendBreakButton);
             this.Controls.Add(this.sendLunchButton);
             this.Controls.Add(this.deleteButton);
@@ -133,5 +145,6 @@
         private System.Windows.Forms.Button sendLunchButton;
         private System.Windows.Forms.Button sendBreakButton;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Button endShiftButton;
     }
 }
