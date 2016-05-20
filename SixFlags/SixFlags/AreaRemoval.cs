@@ -3,16 +3,16 @@ using System.Windows.Forms;
 
 namespace SixFlags
 {
-    public partial class DepartmentRemoval : Form
+    public partial class AreaRemoval : Form
     {
-        public string Department;
+        public string Area;
 
-        public DepartmentRemoval()
+        public AreaRemoval()
         {
             InitializeComponent();
-            foreach (var depart in SixFlagsTracker.Departments)
+            foreach (var depart in SixFlagsTracker.Areas)
             {
-                departmentComboBox.Items.Add(depart.Name);
+                areaComboBox.Items.Add(depart.Name);
             }
         }
 
@@ -24,20 +24,20 @@ namespace SixFlags
 
         private void submitButton_Click(object sender, EventArgs e)
         {
-            if (departmentComboBox.Text != "")
+            if (areaComboBox.Text != "")
             {
                 if (CenteredMessageBox.Show(
-                    string.Format($"Are you sure you want to delete {departmentComboBox.Text}?"),
+                    string.Format($"Are you sure you want to delete {areaComboBox.Text}?"),
                     "Deletion Dialog", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    Department = departmentComboBox.Text;
+                    Area = areaComboBox.Text;
                     DialogResult = DialogResult.Yes;
                     Close();
                 }
             }
             else
             {
-                CenteredMessageBox.Show("Please select a department to delete.", "Error", MessageBoxButtons.OK);
+                CenteredMessageBox.Show("Please select a Area to delete.", "Error", MessageBoxButtons.OK);
             }
         }
     }

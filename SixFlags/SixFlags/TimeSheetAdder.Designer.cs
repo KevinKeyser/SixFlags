@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.departmentComboBox = new System.Windows.Forms.ComboBox();
+            this.areaComboBox = new System.Windows.Forms.ComboBox();
             this.submitButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.nameTextBox = new System.Windows.Forms.TextBox();
-            this.departmentLabel = new System.Windows.Forms.Label();
+            this.areaLabel = new System.Windows.Forms.Label();
             this.nameLabel = new System.Windows.Forms.Label();
             this.timeInLabel = new System.Windows.Forms.Label();
             this.timeOutLabel = new System.Windows.Forms.Label();
@@ -42,16 +42,16 @@
             this.timeOutPicker = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
-            // departmentComboBox
+            // areaComboBox
             // 
-            this.departmentComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.departmentComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.departmentComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.departmentComboBox.FormattingEnabled = true;
-            this.departmentComboBox.Location = new System.Drawing.Point(104, 42);
-            this.departmentComboBox.Name = "departmentComboBox";
-            this.departmentComboBox.Size = new System.Drawing.Size(121, 24);
-            this.departmentComboBox.TabIndex = 1;
+            this.areaComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.areaComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.areaComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.areaComboBox.FormattingEnabled = true;
+            this.areaComboBox.Location = new System.Drawing.Point(104, 42);
+            this.areaComboBox.Name = "areaComboBox";
+            this.areaComboBox.Size = new System.Drawing.Size(121, 24);
+            this.areaComboBox.TabIndex = 1;
             // 
             // submitButton
             // 
@@ -82,14 +82,14 @@
             this.nameTextBox.Size = new System.Drawing.Size(121, 22);
             this.nameTextBox.TabIndex = 2;
             // 
-            // departmentLabel
+            // areaLabel
             // 
-            this.departmentLabel.Location = new System.Drawing.Point(12, 42);
-            this.departmentLabel.Name = "departmentLabel";
-            this.departmentLabel.Size = new System.Drawing.Size(86, 24);
-            this.departmentLabel.TabIndex = 6;
-            this.departmentLabel.Text = "Department";
-            this.departmentLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.areaLabel.Location = new System.Drawing.Point(12, 42);
+            this.areaLabel.Name = "areaLabel";
+            this.areaLabel.Size = new System.Drawing.Size(86, 24);
+            this.areaLabel.TabIndex = 6;
+            this.areaLabel.Text = "Area";
+            this.areaLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // nameLabel
             // 
@@ -171,11 +171,11 @@
             this.Controls.Add(this.timeOutLabel);
             this.Controls.Add(this.timeInLabel);
             this.Controls.Add(this.nameLabel);
-            this.Controls.Add(this.departmentLabel);
+            this.Controls.Add(this.areaLabel);
             this.Controls.Add(this.nameTextBox);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.submitButton);
-            this.Controls.Add(this.departmentComboBox);
+            this.Controls.Add(this.areaComboBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "TimeSheetAdder";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -188,11 +188,11 @@
 
         #endregion
 
-        private System.Windows.Forms.ComboBox departmentComboBox;
+        private System.Windows.Forms.ComboBox areaComboBox;
         private System.Windows.Forms.Button submitButton;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.TextBox nameTextBox;
-        private System.Windows.Forms.Label departmentLabel;
+        private System.Windows.Forms.Label areaLabel;
         private System.Windows.Forms.Label nameLabel;
         private System.Windows.Forms.Label timeInLabel;
         private System.Windows.Forms.Label timeOutLabel;

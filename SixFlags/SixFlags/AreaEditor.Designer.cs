@@ -1,6 +1,6 @@
 ﻿namespace SixFlags
 {
-    partial class DepartmentEditor
+    partial class AreaEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             this.submitButton = new System.Windows.Forms.Button();
             this.newNameLabel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.departmentComboBox = new System.Windows.Forms.ComboBox();
+            this.areaComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.newNameTextBox = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
@@ -72,7 +72,7 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.departmentComboBox);
+            this.panel1.Controls.Add(this.areaComboBox);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.newNameTextBox);
             this.panel1.Controls.Add(this.submitButton);
@@ -84,14 +84,14 @@
             this.panel1.Size = new System.Drawing.Size(249, 118);
             this.panel1.TabIndex = 9;
             // 
-            // departmentComboBox
+            // areaComboBox
             // 
-            this.departmentComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.departmentComboBox.FormattingEnabled = true;
-            this.departmentComboBox.Location = new System.Drawing.Point(106, 12);
-            this.departmentComboBox.Name = "departmentComboBox";
-            this.departmentComboBox.Size = new System.Drawing.Size(130, 24);
-            this.departmentComboBox.TabIndex = 11;
+            this.areaComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.areaComboBox.FormattingEnabled = true;
+            this.areaComboBox.Location = new System.Drawing.Point(106, 12);
+            this.areaComboBox.Name = "areaComboBox";
+            this.areaComboBox.Size = new System.Drawing.Size(130, 24);
+            this.areaComboBox.TabIndex = 11;
             // 
             // label1
             // 
@@ -99,7 +99,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(86, 24);
             this.label1.TabIndex = 10;
-            this.label1.Text = "Department";
+            this.label1.Text = "Area";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // newNameTextBox
@@ -109,7 +109,7 @@
             this.newNameTextBox.Size = new System.Drawing.Size(130, 22);
             this.newNameTextBox.TabIndex = 9;
             // 
-            // DepartmentEditor
+            // AreaEditor
             // 
             this.AcceptButton = this.submitButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -118,10 +118,10 @@
             this.ClientSize = new System.Drawing.Size(249, 118);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "DepartmentEditor";
+            this.Name = "AreaEditor";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "DepartmentAdd";
+            this.Text = "AreaAdd";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -135,6 +135,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox newNameTextBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox departmentComboBox;
+        private System.Windows.Forms.ComboBox areaComboBox;
     }
 }

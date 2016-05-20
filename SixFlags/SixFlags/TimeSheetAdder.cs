@@ -5,22 +5,22 @@ namespace SixFlags
 {
     public partial class TimeSheetAdder : Form
     {
-        public string department;
+        public string area;
         public TimeSheet TimeSheet;
         private ShiftTracker tracker;
 
-        public TimeSheetAdder(ShiftTracker tracker, string Department)
+        public TimeSheetAdder(ShiftTracker tracker, string area)
         {
             InitializeComponent();
-            department = Department;
+            this.area = area;
             this.tracker = tracker;
             TimeSheet = null;
-            foreach (var depart in SixFlagsTracker.Departments)
+            foreach (var depart in SixFlagsTracker.Areas)
             {
-                departmentComboBox.Items.Add(depart.Name);
+                areaComboBox.Items.Add(depart.Name);
             }
 
-            departmentComboBox.SelectedItem = department;
+            areaComboBox.SelectedItem = area;
 
             timeInPicker.Text = DateTime.Now.TimeOfDay.ToString();
             timeOutPicker.Text = DateTime.Now.AddHours(8.75f).TimeOfDay.ToString();
@@ -38,12 +38,12 @@ namespace SixFlags
                 CenteredMessageBox.Show("Enter a name", "Error", MessageBoxButtons.OK);
                 return;
             }
-            foreach (TimeSheet timeSheet in tracker.departments[department].timeSheets)
+            foreach (TimeSheet timeSheet in tracker.Areas[area].timeSheets)
             {
                 if (String.Compare(timeSheet.Name.Trim(), nameTextBox.Text.Trim(),
                         StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    CenteredMessageBox.Show("Name is already in department", "Error", MessageBoxButtons.OK);
+                    CenteredMessageBox.Show("Name is already in area", "Error", MessageBoxButtons.OK);
                     return;
                 }
             }
@@ -55,7 +55,7 @@ namespace SixFlags
                     .Subtract(TimeSpan.FromDays(timeIn > timeOut ? -1 : 0))
                     .Subtract(-timeOut);
             DialogResult = DialogResult.Yes;
-            department = departmentComboBox.Text;
+            area = areaComboBox.Text;
             TimeSheet = new TimeSheet(
                 nameTextBox.Text,
                 dateIn,

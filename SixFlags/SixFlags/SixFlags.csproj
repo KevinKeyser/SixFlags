@@ -93,18 +93,18 @@
     <Compile Include="DatePicker.Designer.cs">
       <DependentUpon>DatePicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="Department.cs" />
-    <Compile Include="DepartmentEditor.cs">
+    <Compile Include="Area.cs" />
+    <Compile Include="AreaEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DepartmentEditor.Designer.cs">
-      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    <Compile Include="AreaEditor.Designer.cs">
+      <DependentUpon>AreaEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="DepartmentAdd.cs">
+    <Compile Include="AreaAdd.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DepartmentAdd.Designer.cs">
-      <DependentUpon>DepartmentAdd.cs</DependentUpon>
+    <Compile Include="AreaAdd.Designer.cs">
+      <DependentUpon>AreaAdd.cs</DependentUpon>
     </Compile>
     <Compile Include="TimeSheetEditor.cs">
       <SubType>Form</SubType>
@@ -118,11 +118,11 @@
     <Compile Include="TimeSheetsEditor.Designer.cs">
       <DependentUpon>TimeSheetsEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="DepartmentRemoval.cs">
+    <Compile Include="AreaRemoval.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DepartmentRemoval.Designer.cs">
-      <DependentUpon>DepartmentRemoval.cs</DependentUpon>
+    <Compile Include="AreaRemoval.Designer.cs">
+      <DependentUpon>AreaRemoval.cs</DependentUpon>
     </Compile>
     <Compile Include="ShiftTracker.cs">
       <SubType>UserControl</SubType>
@@ -151,11 +151,11 @@
     <EmbeddedResource Include="DatePicker.resx">
       <DependentUpon>DatePicker.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DepartmentEditor.resx">
-      <DependentUpon>DepartmentEditor.cs</DependentUpon>
+    <EmbeddedResource Include="AreaEditor.resx">
+      <DependentUpon>AreaEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DepartmentAdd.resx">
-      <DependentUpon>DepartmentAdd.cs</DependentUpon>
+    <EmbeddedResource Include="AreaAdd.resx">
+      <DependentUpon>AreaAdd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TimeSheetEditor.resx">
       <DependentUpon>TimeSheetEditor.cs</DependentUpon>
@@ -163,8 +163,8 @@
     <EmbeddedResource Include="TimeSheetsEditor.resx">
       <DependentUpon>TimeSheetsEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DepartmentRemoval.resx">
-      <DependentUpon>DepartmentRemoval.cs</DependentUpon>
+    <EmbeddedResource Include="AreaRemoval.resx">
+      <DependentUpon>AreaRemoval.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ShiftTracker.resx">
       <DependentUpon>ShiftTracker.cs</DependentUpon>
@@ -193,6 +193,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="SixFlagsTemplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="SixFlags_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SavedData.xml" />
+    <Content Include="Times.txt" />
     <Content Include="TimeSheets.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -215,6 +219,35 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

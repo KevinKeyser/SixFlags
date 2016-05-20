@@ -6,6 +6,8 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Office.Interop.Excel;
+using Button = System.Windows.Forms.Button;
 
 namespace SixFlags
 {
@@ -13,12 +15,12 @@ namespace SixFlags
     {
         public static string TimeSheetsFile = DateTime.Now.ToShortDateString().Replace("/", "-") + "-TimeSheets.xml";
         public static string SavedDataFile = "SavedData.xml";
-        public static List<Department> Departments;
+        public static List<Area> Areas;
         public static DateTime currentSelectedDate;
 
         public SixFlagsTracker()
         {
-            Departments = new List<Department>();
+            Areas = new List<Area>();
             XDocument document;
             currentSelectedDate = DateTime.Now;
 
@@ -28,7 +30,7 @@ namespace SixFlags
             {
                 document = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
                     new XElement("SavedData",
-                        new XElement("Departments"),
+                        new XElement("Areas"),
                         new XElement("Names")));
                 document.Save(SavedDataFile);
             }
@@ -45,11 +47,11 @@ namespace SixFlags
                         new XElement("TimeSheets", new XAttribute("shift", "mid"))));
                 var SavedDocument = XDocument.Load(SavedDataFile);
                 foreach (
-                    XElement departmentElement in SavedDocument.XPathSelectElements("SavedData/Departments/Department"))
+                    XElement areaElement in SavedDocument.XPathSelectElements("SavedData/Areas/Area"))
                 {
                     foreach (XElement timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                     {
-                        timeSheets.Add(departmentElement);
+                        timeSheets.Add(areaElement);
                     }
                 }
                 document.Save(TimeSheetsFile);
@@ -57,13 +59,13 @@ namespace SixFlags
 
             #endregion
 
-            //Add All Departments to Reference List
+            //Add All Areas to Reference List
             document = XDocument.Load(SavedDataFile);
-            document.XPathSelectElements("SavedData/Departments/Department")
+            document.XPathSelectElements("SavedData/Areas/Area")
                 .ToList()
                 .ForEach(element =>
                 {
-                    Departments.Add(new Department(element.Attribute("name").Value));
+                    Areas.Add(new Area(element.Attribute("name").Value));
                 });
 
             InitializeComponent();
@@ -109,11 +111,11 @@ namespace SixFlags
                                 new XElement("TimeSheets", new XAttribute("shift", "mid"))));
                         var SavedDocument = XDocument.Load(SavedDataFile);
                         foreach (
-                            XElement departmentElement in SavedDocument.XPathSelectElements("SavedData/Departments/Department"))
+                            XElement areaElement in SavedDocument.XPathSelectElements("SavedData/Areas/Area"))
                         {
                             foreach (XElement timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                             {
-                                timeSheets.Add(departmentElement);
+                                timeSheets.Add(areaElement);
                             }
                         }
                         document.Save(TimeSheetsFile);
@@ -125,8 +127,8 @@ namespace SixFlags
                     {
                         ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
 
-                        tracker.departments.Keys.ToList()
-                        .ForEach(depart => tracker.departments[depart].timeSheets.Clear());
+                        tracker.Areas.Keys.ToList()
+                        .ForEach(depart => tracker.Areas[depart].timeSheets.Clear());
 
 
                         List<XElement> timeSheets = document.XPathSelectElements("SixFlags/TimeSheets")
@@ -138,18 +140,18 @@ namespace SixFlags
                                                     .ToList();
                         foreach (XElement timeSheet in timeSheets.Elements())
                         {
-                            tracker.departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Add(
+                            tracker.Areas[timeSheet.Parent.Attribute("name").Value].timeSheets.Add(
                                 new TimeSheet(
                                     timeSheet.Attribute("name").Value,
                                     DateTime.Parse(timeSheet.Attribute("timeIn").Value),
                                     DateTime.Parse(timeSheet.Attribute("timeOut").Value)));
                             foreach (XElement Lunch in timeSheet.XPathSelectElements("Lunches/Lunch"))
                             {
-                                tracker.departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Lunch.Attribute("time").Value));
+                                tracker.Areas[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Lunch.Attribute("time").Value));
                             }
                             foreach (XElement Break in timeSheet.XPathSelectElements("Breaks/Break"))
                             {
-                                tracker.departments[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Break.Attribute("time").Value));
+                                tracker.Areas[timeSheet.Parent.Attribute("name").Value].timeSheets.Last().SentLunch.Add(DateTime.Parse(Break.Attribute("time").Value));
                             }
 
                         }
@@ -171,19 +173,19 @@ namespace SixFlags
 
         private void AddTool_Click(object sender, EventArgs e)
         {
-            var add = new DepartmentAdd();
+            var add = new AreaAdd();
             add.ShowDialog();
             if (add.DialogResult == DialogResult.Yes)
             {
-                //Add Department to SavedData
+                //Add Area to SavedData
                 var document = XDocument.Load(SavedDataFile);
-                var departElement = new XElement("Department");
-                departElement.SetAttributeValue("name", add.Department);
-                document.XPathSelectElement("SavedData/Departments")
+                var departElement = new XElement("Area");
+                departElement.SetAttributeValue("name", add.Area);
+                document.XPathSelectElement("SavedData/Areas")
                     .Add(departElement);
                 document.Save(SavedDataFile);
 
-                //Add Department to Current TimeSheets
+                //Add Area to Current TimeSheets
                 document = XDocument.Load(TimeSheetsFile);
                 document.XPathSelectElements("SixFlags/TimeSheets")
                     .ToList()
@@ -191,30 +193,30 @@ namespace SixFlags
                             element.Add(departElement));
                 document.Save(TimeSheetsFile);
 
-                //Add Department to Reference List
-                Departments.Add(new Department(add.Department));
+                //Add Area to Reference List
+                Areas.Add(new Area(add.Area));
 
                 //Add Button to Tabs
                 foreach (TabPage tabPage in shiftTimes.TabPages)
                 {
                     ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
-                    tracker.AddDepartment(add.Department);
+                    tracker.AddArea(add.Area);
                 }
             }
         }
 
         private void EditTool_Click(object sender, EventArgs e)
         {
-            var editor = new DepartmentEditor();
+            var editor = new AreaEditor();
             editor.ShowDialog();
             if (editor.DialogResult == DialogResult.Yes)
             {
-                //Edit Departments in SavedData
+                //Edit Areas in SavedData
                 var document = XDocument.Load(SavedDataFile);
-                document.XPathSelectElements("SavedData/Departments/Department")
+                document.XPathSelectElements("SavedData/Areas/Area")
                     .ToList()
                     .FindAll(element =>
-                        String.Compare(element.Attribute("name").Value, editor.Department,
+                        String.Compare(element.Attribute("name").Value, editor.Area,
                             StringComparison.CurrentCultureIgnoreCase) == 0)
                     .ForEach(element =>
                     {
@@ -222,12 +224,12 @@ namespace SixFlags
                     });
                 document.Save(SavedDataFile);
 
-                //Edit Department in Current TimeSheets
+                //Edit Area in Current TimeSheets
                 document = XDocument.Load(TimeSheetsFile);
-                document.XPathSelectElements("SixFlags/TimeSheets/Department")
+                document.XPathSelectElements("SixFlags/TimeSheets/Area")
                     .ToList()
                     .FindAll(element =>
-                        String.Compare(element.Attribute("name").Value, editor.Department,
+                        String.Compare(element.Attribute("name").Value, editor.Area,
                             StringComparison.CurrentCultureIgnoreCase) == 0)
                     .ForEach(element =>
                     {
@@ -235,21 +237,21 @@ namespace SixFlags
                     });
                 document.Save(TimeSheetsFile);
 
-                //Edit Department in Reference List
-                Departments.Find(department => String.Compare(department.Name, editor.Department,
+                //Edit Area in Reference List
+                Areas.Find(area => String.Compare(area.Name, editor.Area,
                     StringComparison.CurrentCultureIgnoreCase) == 0).Name = editor.newName;
 
                 //Edit Button from Tabs
                 foreach (TabPage tabPage in shiftTimes.TabPages)
                 {
                     ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
-                    Department dept = tracker.departments[editor.Department];
-                    tracker.departments.Remove(editor.Department);
-                    tracker.departments.Add(editor.newName, dept);
+                    Area dept = tracker.Areas[editor.Area];
+                    tracker.Areas.Remove(editor.Area);
+                    tracker.Areas.Add(editor.newName, dept);
                     List<Button> buttons = tracker.Controls.OfType<Button>().ToList();
                     foreach (Button button in buttons)
                     {
-                        if (String.Compare(button.Text, editor.Department, StringComparison.CurrentCultureIgnoreCase) == 0)
+                        if (String.Compare(button.Text, editor.Area, StringComparison.CurrentCultureIgnoreCase) == 0)
                         {
                             button.Text = editor.newName;
                         }
@@ -260,17 +262,17 @@ namespace SixFlags
 
         private void RemoveTool_Click(object sender, EventArgs e)
         {
-            var removal = new DepartmentRemoval();
+            var removal = new AreaRemoval();
             removal.ShowDialog();
             if (removal.DialogResult == DialogResult.Yes)
             {
-                var departmentDelete = removal.Department;
+                var areaDelete = removal.Area;
 
-                //Remove Department From Saved Data
+                //Remove Area From Saved Data
                 var document = XDocument.Load(SavedDataFile);
-                document.XPathSelectElements("SavedData/Departments/Department")
+                document.XPathSelectElements("SavedData/Areas/Area")
                     .ToList()
-                    .FindAll(element => String.Compare(element.Attribute("name").Value, departmentDelete,
+                    .FindAll(element => String.Compare(element.Attribute("name").Value, areaDelete,
                         StringComparison.CurrentCultureIgnoreCase) == 0)
                     .ForEach(element =>
                 {
@@ -278,11 +280,11 @@ namespace SixFlags
                 });
                 document.Save(SavedDataFile);
 
-                //Remove Department from Current TimeSheets
+                //Remove Area from Current TimeSheets
                 document = XDocument.Load(TimeSheetsFile);
-                document.XPathSelectElements("SixFlags/TimeSheets/Department")
+                document.XPathSelectElements("SixFlags/TimeSheets/Area")
                     .ToList()
-                    .FindAll(element => String.Compare(element.Attribute("name").Value, departmentDelete,
+                    .FindAll(element => String.Compare(element.Attribute("name").Value, areaDelete,
                         StringComparison.CurrentCultureIgnoreCase) == 0)
                     .ForEach(element =>
                     {
@@ -291,9 +293,9 @@ namespace SixFlags
 
                 document.Save(TimeSheetsFile);
 
-                //Remove Department from ReferenceList
-                Departments.Remove(
-                    Departments.Find(department => String.Compare(department.Name, departmentDelete,
+                //Remove Area from ReferenceList
+                Areas.Remove(
+                    Areas.Find(area => String.Compare(area.Name, areaDelete,
                         StringComparison.CurrentCultureIgnoreCase) == 0));
 
                 //Remove Button from Tabs
@@ -303,7 +305,7 @@ namespace SixFlags
                     List<Button> buttons = tracker.Controls.OfType<Button>().ToList();
                     for (int i = 0; i < buttons.Count; i++)
                     {
-                        if (String.Compare(buttons[i].Text, departmentDelete, StringComparison.CurrentCultureIgnoreCase) == 0)
+                        if (String.Compare(buttons[i].Text, areaDelete, StringComparison.CurrentCultureIgnoreCase) == 0)
                         {
                             tracker.Controls.Remove(buttons[i]);
                             break;
@@ -328,21 +330,106 @@ namespace SixFlags
                 document.Save(TimeSheetsFile);
 
                 //Remove All TimeSheet References
-                Departments.ForEach(department =>
+                Areas.ForEach(area =>
                 {
-                    department.timeSheets.Clear();
+                    area.timeSheets.Clear();
                 });
 
                 //Remove All TimeSheets from Tab Reference
                 foreach (TabPage tabPage in shiftTimes.TabPages)
                 {
                     ShiftTracker shiftTracker = (ShiftTracker)tabPage.Controls[0];
-                    foreach (string key in shiftTracker.departments.Keys)
+                    foreach (string key in shiftTracker.Areas.Keys)
                     {
-                        shiftTracker.departments[key].timeSheets.Clear();
+                        shiftTracker.Areas[key].timeSheets.Clear();
                     }
                 }
             }
+        }
+
+        private void fileSaveExcelTool_Click(object sender, EventArgs e)
+        {
+            Microsoft.Office.Interop.Excel.Application xlApplication = new Microsoft.Office.Interop.Excel.Application();
+
+
+            if (xlApplication == null)
+            {
+                CenteredMessageBox.Show(
+                    "EXCEL could not be started. Check that your office installation and project references are correct.",
+                    "Error", MessageBoxButtons.OK);
+                return;
+            }
+
+            Microsoft.Office.Interop.Excel.Workbook workbook = xlApplication.Workbooks.Open(Environment.CurrentDirectory + @"\SixFlagsTemplate.xlsx");
+
+            Microsoft.Office.Interop.Excel.Worksheet excelWorksheet = (Microsoft.Office.Interop.Excel.Worksheet)xlApplication.Sheets.get_Item("Security Day Shift Plan");
+
+
+            Microsoft.Office.Interop.Excel.Range range = xlApplication.Range["A1", "R68"];
+            foreach (TabPage tabPage in shiftTimes.TabPages)
+            {
+                ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
+                foreach (string area in tracker.Areas.Keys)
+                {
+                    Microsoft.Office.Interop.Excel.Range curentCell = null;
+
+                    bool findByIndex = true;
+                    curentCell = range.Find(area);
+                    if (curentCell != null)
+                    {
+                        findByIndex = false;
+                    }
+                    Microsoft.Office.Interop.Excel.Range original = curentCell;
+
+                    for (int i = 0, j = 0; i < tracker.Areas[area].timeSheets.Count; i++)
+                    {
+                        TimeSheet timeSheet = tracker.Areas[area].timeSheets[i];
+                        if (findByIndex)
+                        {
+                            curentCell = range.Find($"{area} {i + 1}");
+                        }
+                        else
+                        {
+                            if (i > 0)
+                            {
+                                curentCell = range.FindNext(original);
+                                original = curentCell;
+                            }
+                        }
+                        if (curentCell != null)
+                        {
+                            curentCell = curentCell.Next;
+                            curentCell.Value2 = timeSheet.Name;
+                            curentCell = curentCell.Next;
+                            curentCell = curentCell.Next;
+                            for (int ii = 0; ii < 2; ii++)
+                            {
+                                if (timeSheet.SentBreak.Count > ii)
+                                {
+                                    curentCell.NumberFormat = "hh:mm:ss";
+                                    curentCell.Value2 = timeSheet.SentBreak[ii].TimeOfDay.ToString();
+                                }
+
+                                curentCell = curentCell.Next;
+                                if (timeSheet.SentLunch.Count > ii)
+                                {
+                                    curentCell.NumberFormat = "hh:mm:ss";
+                                    curentCell.Value2 = timeSheet.SentLunch[ii].TimeOfDay.ToString();
+                                }
+                                curentCell = curentCell.Next;
+                            }
+                            if (timeSheet.SentBreak.Count > 2)
+                            {
+                                curentCell.NumberFormat = "hh:mm:ss";
+                                curentCell.Value2 = timeSheet.SentBreak[2].TimeOfDay.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            xlApplication.DisplayAlerts = false;
+            workbook.SaveAs(Environment.CurrentDirectory + $@"/SixFlags{currentSelectedDate.Date.ToShortDateString().Replace("/", "_")}.xlsx");
+            workbook.Close();
         }
     }
 }

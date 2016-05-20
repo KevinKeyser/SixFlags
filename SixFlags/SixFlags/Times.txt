@@ -1,0 +1,28 @@
+﻿TimeIn = 00:00
+Break1 - 3:45 gap from lunch end
+	Warning = 03:25
+	Danger  = 03:35
+	Penalty	= 03:45
+Lunch1 - 5:00 gap from lunch end
+	Warning = 04:40
+	Danger  = 04:50
+	Penalty	= 05:00
+	EndTime	= 05:45
+Break2 - 3:45 gap from lunch end
+	Warning = 09:10
+	Danger  = 09:20
+	Penalty	= 09:30
+Lunch2 - 5:00 gap from lunch end
+	Warning = 10:25
+	Danger  = 10:35
+	Penalty	= 10:45
+	EndTime	= 11:30
+Break3 - 3:45 gap from lunch end
+	Warning = 14:55
+	Danger  = 15:05
+	Penalty	= 15:15
+Lunch3 - 5:00 gap from lunch end
+	Warning = 16:10
+	Danger  = 16:20
+	Penalty	= 16:30
+	EndTime = 17:15

@@ -3,17 +3,17 @@ using System.Windows.Forms;
 
 namespace SixFlags
 {
-    public partial class DepartmentEditor : Form
+    public partial class AreaEditor : Form
     {
-        public string Department;
+        public string Area;
         public string newName;
 
-        public DepartmentEditor()
+        public AreaEditor()
         {
             InitializeComponent();
-            foreach (Department department in SixFlagsTracker.Departments)
+            foreach (Area area in SixFlagsTracker.Areas)
             {
-                departmentComboBox.Items.Add(department.Name);
+                areaComboBox.Items.Add(area.Name);
             }
         }
 
@@ -25,19 +25,19 @@ namespace SixFlags
 
         private void submitButton_Click(object sender, EventArgs e)
         {
-            if (departmentComboBox.Text == "")
+            if (areaComboBox.Text == "")
             {
-                CenteredMessageBox.Show("Please type a select a Department to edit.", "Error", MessageBoxButtons.OK);
+                CenteredMessageBox.Show("Please type a select a Area to edit.", "Error", MessageBoxButtons.OK);
                 return;
             }
             if (newNameTextBox.Text == "")
             {
-                CenteredMessageBox.Show("Please type a new Department name.", "Error", MessageBoxButtons.OK);
+                CenteredMessageBox.Show("Please type a new Area name.", "Error", MessageBoxButtons.OK);
                 return;
             }
-            Department = departmentComboBox.Text;
+            Area = areaComboBox.Text;
             if (
-                CenteredMessageBox.Show("Are you sure you want to " + Department + " to " + newNameTextBox.Text + "?",
+                CenteredMessageBox.Show("Are you sure you want to " + Area + " to " + newNameTextBox.Text + "?",
                     "Warning", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;

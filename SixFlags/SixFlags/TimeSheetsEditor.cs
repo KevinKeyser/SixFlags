@@ -17,16 +17,16 @@ namespace SixFlags
 
         //undo break 10 mins max time
         private string shift;
-        private Department department;
+        private Area _area;
         private ShiftTracker tracker;
 
-        public TimeSheetsEditor(ShiftTracker tracker, string shift, Department department)
+        public TimeSheetsEditor(ShiftTracker tracker, string shift, Area _area)
         {
             this.tracker = tracker;
             InitializeComponent();
             this.shift = shift;
-            this.department = department;
-            foreach (TimeSheet timeSheet in this.department.timeSheets)
+            this._area = _area;
+            foreach (TimeSheet timeSheet in this._area.timeSheets)
             {
                 timeSheetListBox.Items.Add(timeSheet.Name);
             }
@@ -42,33 +42,25 @@ namespace SixFlags
             {
                 return;
             }
-            TimeSpan timePast = DateTime.Now - department.timeSheets[e.Index].TimeIn;
+            TimeSpan timePast = DateTime.Now - _area.timeSheets[e.Index].TimeIn;
             Brush brush = Brushes.White;
-            if (DateTime.Now > department.timeSheets[e.Index].TimeOut)
+            if (DateTime.Now > _area.timeSheets[e.Index].TimeOut)
             {
                 brush = Brushes.LightGray;
             }
-            if (timePast >=
-                TimeSpan.FromHours(5 * (department.timeSheets[e.Index].SentLunch.Count + 1) -
-                                   .75f * department.timeSheets[e.Index].SentLunch.Count - 15 / 60f))
+            else if (timePast >= _area.timeSheets[e.Index].getNextLunch() - TimeSpan.FromHours(1 / 6f))
             {
                 brush = Brushes.Red;
             }
-            else if (timePast >=
-                     TimeSpan.FromHours(3.75f * (department.timeSheets[e.Index].SentBreak.Count + 1) -
-                                        .75f * department.timeSheets[e.Index].SentLunch.Count - 15 / 60f))
+            else if (timePast >= _area.timeSheets[e.Index].getNextBreak() - TimeSpan.FromHours(1 / 6f))
             {
                 brush = Brushes.Red;
             }
-            else if (timePast >=
-                     TimeSpan.FromHours(5 * (department.timeSheets[e.Index].SentLunch.Count + 1) -
-                                        .75f * department.timeSheets[e.Index].SentLunch.Count - 1))
+            else if (timePast >= _area.timeSheets[e.Index].getNextLunch() - TimeSpan.FromHours(1 / 3f))
             {
                 brush = Brushes.Yellow;
             }
-            else if (timePast >=
-                     TimeSpan.FromHours(3.75f * (department.timeSheets[e.Index].SentBreak.Count + 1) -
-                                        .75f * department.timeSheets[e.Index].SentLunch.Count - 1))
+            else if (timePast >= _area.timeSheets[e.Index].getNextBreak() - TimeSpan.FromHours(1 / 3f))
             {
                 brush = Brushes.Yellow;
             }
@@ -77,18 +69,18 @@ namespace SixFlags
                 brush = Brushes.LightBlue;
             }
             e.Graphics.FillRectangle(brush, e.Bounds);
-            e.Graphics.DrawString(department.timeSheets[e.Index].Name, e.Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
+            e.Graphics.DrawString(_area.timeSheets[e.Index].Name, e.Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
         }
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            var timeSheetAdder = new TimeSheetAdder(tracker, department.Name);
+            var timeSheetAdder = new TimeSheetAdder(tracker, _area.Name);
             timeSheetAdder.ShowDialog();
 
             if (timeSheetAdder.DialogResult == DialogResult.Yes)
             {
-                tracker.departments[timeSheetAdder.department].timeSheets.Add(timeSheetAdder.TimeSheet);
-                if (String.Compare(timeSheetAdder.department, department.Name, StringComparison.CurrentCultureIgnoreCase) ==
+                tracker.Areas[timeSheetAdder.area].timeSheets.Add(timeSheetAdder.TimeSheet);
+                if (String.Compare(timeSheetAdder.area, _area.Name, StringComparison.CurrentCultureIgnoreCase) ==
                     0)
                 {
                     timeSheetListBox.Items.Add(timeSheetAdder.TimeSheet.Name);
@@ -109,11 +101,11 @@ namespace SixFlags
                         continue;
                     }
 
-                    foreach (XElement xDepartment in timeSheets.Elements())
+                    foreach (XElement xArea in timeSheets.Elements())
                     {
-                        if (xDepartment.Attribute("name").Value == tracker.departments[timeSheetAdder.department].Name)
+                        if (xArea.Attribute("name").Value == tracker.Areas[timeSheetAdder.area].Name)
                         {
-                            xDepartment.Add(timeSheet);
+                            xArea.Add(timeSheet);
                         }
                     }
                 }
@@ -128,22 +120,22 @@ namespace SixFlags
             {
                 return;
             }
-            TimeSheetEditor editor = new TimeSheetEditor(department, department.timeSheets[index]);
+            TimeSheetEditor editor = new TimeSheetEditor(_area, _area.timeSheets[index]);
             editor.ShowDialog();
             if (editor.DialogResult == DialogResult.Yes)
             {
                 XDocument document = XDocument.Load(SixFlagsTracker.TimeSheetsFile);
-                List<XElement> departmentElements =
+                List<XElement> areaElements =
                     document.XPathSelectElements("SixFlags/TimeSheets").ToList().Find(
                         element =>
                         String.Compare(element.Attribute("shift").Value, shift,
                             StringComparison.CurrentCultureIgnoreCase) == 0)
-                            .XPathSelectElements("Department").ToList();
-                foreach (XElement departmentElement in departmentElements)
+                            .XPathSelectElements("Area").ToList();
+                foreach (XElement areaElement in areaElements)
                 {
-                    if (String.Compare(departmentElement.Attribute("name").Value, department.Name, StringComparison.CurrentCultureIgnoreCase) == 0)
+                    if (String.Compare(areaElement.Attribute("name").Value, _area.Name, StringComparison.CurrentCultureIgnoreCase) == 0)
                     {
-                        departmentElement.XPathSelectElements("TimeSheet").ToList().ForEach(
+                        areaElement.XPathSelectElements("TimeSheet").ToList().ForEach(
                             element =>
                         {
                             if (element.Attribute("name").Value == editor.oldName)
@@ -155,7 +147,7 @@ namespace SixFlags
                         });
                     }
                 }
-                department.timeSheets[index] = editor.newTimeSheet;
+                _area.timeSheets[index] = editor.newTimeSheet;
                 timeSheetListBox.Items[index] = editor.newTimeSheet.Name;
                 document.Save(SixFlagsTracker.TimeSheetsFile);
             }
@@ -178,17 +170,18 @@ namespace SixFlags
                 {
                     if (timeSheetsElement.Attribute("shift").Value.ToLower() == shift.ToLower())
                     {
-                        var departmentElements = timeSheetsElement.XPathSelectElements("Department");
+                        var areaElements = timeSheetsElement.XPathSelectElements("Area");
 
-                        foreach (XElement departmentElement in departmentElements)
+                        foreach (XElement areaElement in areaElements)
                         {
-                            if (departmentElement.Attribute("name").Value.ToLower() == department.Name.ToLower())
+                            if (areaElement.Attribute("name").Value.ToLower() == _area.Name.ToLower())
                             {
-                                var timeSheetElements = departmentElement.XPathSelectElements("TimeSheet");
+                                var timeSheetElements = areaElement.XPathSelectElements("TimeSheet");
                                 foreach (XElement timeSheetElement in timeSheetElements)
                                 {
-                                    if (timeSheetElement.Attribute("name").Value.ToLower() ==
-                                        timeSheetListBox.Items[index].ToString().ToLower())
+                                    if (String.Equals(  timeSheetElement.Attribute("name").Value, 
+                                                        timeSheetListBox.Items[index].ToString(), 
+                                                        StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         timeSheetElement.Remove();
                                     }
@@ -199,7 +192,7 @@ namespace SixFlags
                 }
 
                 document.Save(SixFlagsTracker.TimeSheetsFile);
-                department.timeSheets.RemoveAt(index);
+                _area.timeSheets.RemoveAt(index);
                 timeSheetListBox.Items.RemoveAt(index);
             }
         }
@@ -214,7 +207,7 @@ namespace SixFlags
             XDocument document = XDocument.Load(SixFlagsTracker.TimeSheetsFile);
             if (sendLunchButton.Text == "Undo Lunch")
             {
-                department.timeSheets[index].SentLunch.RemoveAt(department.timeSheets[index].SentLunch.Count - 1);
+                _area.timeSheets[index].SentLunch.RemoveAt(_area.timeSheets[index].SentLunch.Count - 1);
                 foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                 {
                     if (timeSheets.Attribute("shift").Value != shift.ToLower())
@@ -222,13 +215,13 @@ namespace SixFlags
                         continue;
                     }
 
-                    foreach (XElement xDepartment in timeSheets.Elements())
+                    foreach (XElement xArea in timeSheets.Elements())
                     {
-                        if (xDepartment.Attribute("name").Value == department.Name)
+                        if (xArea.Attribute("name").Value == _area.Name)
                         {
-                            xDepartment.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
+                            xArea.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
                             {
-                                if (String.Compare(element.Attribute("name").Value, department.timeSheets[index].Name,
+                                if (String.Compare(element.Attribute("name").Value, _area.timeSheets[index].Name,
                                     StringComparison.CurrentCultureIgnoreCase) == 0)
                                 {
                                     element.XPathSelectElements("Lunches/Lunch").Last().Remove();
@@ -242,7 +235,7 @@ namespace SixFlags
             }
             else
             {
-                department.timeSheets[index].SentLunch.Add(DateTime.Now);
+                _area.timeSheets[index].SentLunch.Add(DateTime.Now);
                 foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                 {
                     if (timeSheets.Attribute("shift").Value != shift.ToLower())
@@ -250,18 +243,18 @@ namespace SixFlags
                         continue;
                     }
 
-                    foreach (XElement xDepartment in timeSheets.Elements())
+                    foreach (XElement xArea in timeSheets.Elements())
                     {
-                        if (xDepartment.Attribute("name").Value == department.Name)
+                        if (xArea.Attribute("name").Value == _area.Name)
                         {
-                            xDepartment.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
+                            xArea.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
                             {
-                                if (String.Compare(element.Attribute("name").Value, department.timeSheets[index].Name,
+                                if (String.Compare(element.Attribute("name").Value, _area.timeSheets[index].Name,
                                     StringComparison.CurrentCultureIgnoreCase) == 0)
                                 {
                                     XElement lunchElement = new XElement("Lunch");
                                     lunchElement.SetAttributeValue("time",
-                                        department.timeSheets[index].SentLunch.Last().ToString());
+                                        _area.timeSheets[index].SentLunch.Last().ToString());
                                     element.XPathSelectElement("Lunches").Add(lunchElement);
                                 }
                             });
@@ -282,7 +275,7 @@ namespace SixFlags
             XDocument document = XDocument.Load(SixFlagsTracker.TimeSheetsFile);
             if (sendBreakButton.Text == "Undo Break")
             {
-                department.timeSheets[index].SentBreak.RemoveAt(department.timeSheets[index].SentBreak.Count - 1);
+                _area.timeSheets[index].SentBreak.RemoveAt(_area.timeSheets[index].SentBreak.Count - 1);
                 foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                 {
                     if (timeSheets.Attribute("shift").Value != shift.ToLower())
@@ -290,13 +283,13 @@ namespace SixFlags
                         continue;
                     }
 
-                    foreach (XElement xDepartment in timeSheets.Elements())
+                    foreach (XElement xArea in timeSheets.Elements())
                     {
-                        if (xDepartment.Attribute("name").Value == department.Name)
+                        if (xArea.Attribute("name").Value == _area.Name)
                         {
-                            xDepartment.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
+                            xArea.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
                             {
-                                if (String.Compare(element.Attribute("name").Value, department.timeSheets[index].Name,
+                                if (String.Compare(element.Attribute("name").Value, _area.timeSheets[index].Name,
                                     StringComparison.CurrentCultureIgnoreCase) == 0)
                                 {
                                     element.XPathSelectElements("Breaks/Break").Last().Remove();
@@ -310,7 +303,7 @@ namespace SixFlags
             }
             else
             {
-                department.timeSheets[index].SentBreak.Add(DateTime.Now);
+                _area.timeSheets[index].SentBreak.Add(DateTime.Now);
                 foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
                 {
                     if (timeSheets.Attribute("shift").Value != shift.ToLower())
@@ -318,18 +311,18 @@ namespace SixFlags
                         continue;
                     }
 
-                    foreach (XElement xDepartment in timeSheets.Elements())
+                    foreach (XElement xArea in timeSheets.Elements())
                     {
-                        if (xDepartment.Attribute("name").Value == department.Name)
+                        if (xArea.Attribute("name").Value == _area.Name)
                         {
-                            xDepartment.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
+                            xArea.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
                             {
-                                if (String.Compare(element.Attribute("name").Value, department.timeSheets[index].Name,
+                                if (String.Compare(element.Attribute("name").Value, _area.timeSheets[index].Name,
                                     StringComparison.CurrentCultureIgnoreCase) == 0)
                                 {
                                     XElement breakElement = new XElement("Break");
                                     breakElement.SetAttributeValue("time",
-                                        department.timeSheets[index].SentBreak.Last().ToString());
+                                        _area.timeSheets[index].SentBreak.Last().ToString());
                                     element.XPathSelectElement("Breaks").Add(breakElement);
                                 }
                             });
@@ -342,11 +335,11 @@ namespace SixFlags
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            if (timeSheetListBox.SelectedIndex == -1 || department.timeSheets.Count <= timeSheetListBox.SelectedIndex)
+            if (timeSheetListBox.SelectedIndex == -1 || _area.timeSheets.Count <= timeSheetListBox.SelectedIndex)
             {
                 return;
             }
-            TimeSheet timeSheet = department.timeSheets[timeSheetListBox.SelectedIndex];
+            TimeSheet timeSheet = _area.timeSheets[timeSheetListBox.SelectedIndex];
             if (timeSheet.SentBreak.Count > 0 && DateTime.Now - timeSheet.SentBreak.Last() <= TimeSpan.FromMinutes(10))
             {
                 sendBreakButton.Text = "Undo Break";
@@ -372,7 +365,7 @@ namespace SixFlags
             {
                 return;
             }
-            department.timeSheets[index].TimeOut = DateTime.Now;
+            _area.timeSheets[index].TimeOut = DateTime.Now;
             var document = XDocument.Load(SixFlagsTracker.TimeSheetsFile);
             foreach (var timeSheets in document.XPathSelectElements("SixFlags/TimeSheets"))
             {
@@ -381,21 +374,24 @@ namespace SixFlags
                     continue;
                 }
 
-                foreach (XElement xDepartment in timeSheets.Elements())
+                foreach (XElement xArea in timeSheets.Elements())
                 {
-                    if (xDepartment.Attribute("name").Value == department.Name)
+                    if (xArea.Attribute("name").Value == _area.Name)
                     {
-                        xDepartment.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
+                        xArea.XPathSelectElements("TimeSheet").ToList().ForEach(element =>
                         {
-                            if (String.Compare(element.Attribute("name").Value, department.timeSheets[index].Name,
+                            if (String.Compare(element.Attribute("name").Value, _area.timeSheets[index].Name,
                                 StringComparison.CurrentCultureIgnoreCase) == 0)
                             {
-                                element.SetAttributeValue("timeOut", department.timeSheets[index].TimeOut.ToString());
+                                element.SetAttributeValue("timeOut", _area.timeSheets[index].TimeOut.ToString());
                             }
                         });
                     }
                 }
             }
+            _area.EndedTimeSheets.Add(_area.timeSheets[index]);
+            _area.timeSheets.RemoveAt(index);
+            timeSheetListBox.Items.RemoveAt(index);
             document.Save(SixFlagsTracker.TimeSheetsFile);
         }
     }

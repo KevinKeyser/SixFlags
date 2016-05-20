@@ -23,5 +23,17 @@ namespace SixFlags
         public List<DateTime> SentLunch;
 
         public List<DateTime> SentBreak;
+
+        public TimeSpan getNextLunch()
+        {
+            return TimeSpan.FromHours(5 * (SentLunch.Count + 1) + .75f * SentLunch.Count);
+        }
+
+        public TimeSpan getNextBreak()
+        {
+            return (SentBreak.Count <= SentLunch.Count
+                ? TimeSpan.FromHours(5.75f * SentLunch.Count + 3.75f)
+                : TimeSpan.FromHours((SentLunch.Count + 1) * 3.75f));
+        }
     }
 }

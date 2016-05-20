@@ -2,13 +2,16 @@
 
 namespace SixFlags
 {
-    public class Department
+    public class Area
     {
         public List<TimeSheet> timeSheets;
 
-        public Department(string name)
+        public List<TimeSheet> EndedTimeSheets;
+
+        public Area(string name)
         {
             timeSheets = new List<TimeSheet>();
+            EndedTimeSheets = new List<TimeSheet>();
             Name = name;
         }
 

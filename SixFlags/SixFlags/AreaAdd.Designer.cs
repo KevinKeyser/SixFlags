@@ -1,6 +1,6 @@
 ﻿namespace SixFlags
 {
-    partial class DepartmentAdd
+    partial class AreaAdd
     {
         /// <summary>
         /// Required designer variable.
@@ -30,9 +30,9 @@
         {
             this.cancelButton = new System.Windows.Forms.Button();
             this.submitButton = new System.Windows.Forms.Button();
-            this.departmentLabel = new System.Windows.Forms.Label();
+            this.areaLabel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.departmentTextBox = new System.Windows.Forms.TextBox();
+            this.areaTextBox = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,21 +58,21 @@
             this.submitButton.UseVisualStyleBackColor = true;
             this.submitButton.Click += new System.EventHandler(this.submitButton_Click);
             // 
-            // departmentLabel
+            // areaLabel
             // 
-            this.departmentLabel.Location = new System.Drawing.Point(12, 9);
-            this.departmentLabel.Name = "departmentLabel";
-            this.departmentLabel.Size = new System.Drawing.Size(86, 24);
-            this.departmentLabel.TabIndex = 8;
-            this.departmentLabel.Text = "Department";
-            this.departmentLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.areaLabel.Location = new System.Drawing.Point(12, 9);
+            this.areaLabel.Name = "areaLabel";
+            this.areaLabel.Size = new System.Drawing.Size(86, 24);
+            this.areaLabel.TabIndex = 8;
+            this.areaLabel.Text = "Area";
+            this.areaLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.departmentTextBox);
+            this.panel1.Controls.Add(this.areaTextBox);
             this.panel1.Controls.Add(this.submitButton);
-            this.panel1.Controls.Add(this.departmentLabel);
+            this.panel1.Controls.Add(this.areaLabel);
             this.panel1.Controls.Add(this.cancelButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -80,14 +80,14 @@
             this.panel1.Size = new System.Drawing.Size(249, 87);
             this.panel1.TabIndex = 9;
             // 
-            // departmentTextBox
+            // areaTextBox
             // 
-            this.departmentTextBox.Location = new System.Drawing.Point(104, 11);
-            this.departmentTextBox.Name = "departmentTextBox";
-            this.departmentTextBox.Size = new System.Drawing.Size(130, 22);
-            this.departmentTextBox.TabIndex = 9;
+            this.areaTextBox.Location = new System.Drawing.Point(104, 11);
+            this.areaTextBox.Name = "areaTextBox";
+            this.areaTextBox.Size = new System.Drawing.Size(130, 22);
+            this.areaTextBox.TabIndex = 9;
             // 
-            // DepartmentAdd
+            // AreaAdd
             // 
             this.AcceptButton = this.submitButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -96,10 +96,10 @@
             this.ClientSize = new System.Drawing.Size(249, 87);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "DepartmentAdd";
+            this.Name = "AreaAdd";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "DepartmentAdd";
+            this.Text = "AreaAdd";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -109,8 +109,8 @@
         #endregion
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button submitButton;
-        private System.Windows.Forms.Label departmentLabel;
+        private System.Windows.Forms.Label areaLabel;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox departmentTextBox;
+        private System.Windows.Forms.TextBox areaTextBox;
     }
 }

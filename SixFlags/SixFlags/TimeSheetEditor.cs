@@ -7,15 +7,15 @@ namespace SixFlags
     public partial class TimeSheetEditor : Form
     {
         public string oldName;
-        private Department department;
+        private Area _area;
         public TimeSheet newTimeSheet;
         private List<DateTime> lunches;
         private List<DateTime> breaks;
         private TimeSheet oldTimeSheet;
 
-        public TimeSheetEditor(Department department, TimeSheet timeSheet)
+        public TimeSheetEditor(Area _area, TimeSheet timeSheet)
         {
-            this.department = department;
+            this._area = _area;
             oldTimeSheet = timeSheet;
             InitializeComponent();
             oldName = timeSheet.Name;
@@ -42,7 +42,7 @@ namespace SixFlags
                 CenteredMessageBox.Show("Enter a name", "Error", MessageBoxButtons.OK);
                 return;
             }
-            foreach (TimeSheet timeSheet in department.timeSheets)
+            foreach (TimeSheet timeSheet in _area.timeSheets)
             {
                 if (timeSheet == oldTimeSheet)
                 {
@@ -51,7 +51,7 @@ namespace SixFlags
                 if (String.Compare(timeSheet.Name.Trim(), nameTextBox.Text.Trim(),
                         StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    CenteredMessageBox.Show("Name is already in department", "Error", MessageBoxButtons.OK);
+                    CenteredMessageBox.Show("Name is already in Area", "Error", MessageBoxButtons.OK);
                     return;
                 }
             }

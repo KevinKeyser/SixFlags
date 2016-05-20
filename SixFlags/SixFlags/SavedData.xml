@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?> 
  <SavedData>
-    <Departments>
-      <Department name="Mobile" />
-      <Department name="Ped Gate" />
-      <Department name="1" />
-      <Department name="2" />
-    </Departments>
+    <Areas>
+      <Area name="Mobile" />
+      <Area name="Ped Gate" />
+      <Area name="1" />
+      <Area name="2" />
+    </Areas>
     <Names>
     </Names>
   </SavedData>

@@ -3,11 +3,11 @@ using System.Windows.Forms;
 
 namespace SixFlags
 {
-    public partial class DepartmentAdd : Form
+    public partial class AreaAdd : Form
     {
-        public string Department;
+        public string Area;
 
-        public DepartmentAdd()
+        public AreaAdd()
         {
             InitializeComponent();
         }
@@ -20,27 +20,27 @@ namespace SixFlags
 
         private void submitButton_Click(object sender, EventArgs e)
         {
-            foreach (var department in SixFlagsTracker.Departments)
+            foreach (var area in SixFlagsTracker.Areas)
             {
-                if (department.Name == Department)
+                if (area.Name == Area)
                 {
-                    CenteredMessageBox.Show("Department already created.", "Error", MessageBoxButtons.OK);
+                    CenteredMessageBox.Show("Area already created.", "Error", MessageBoxButtons.OK);
                     return;
                 }
             }
-            if (departmentTextBox.Text != "")
+            if (areaTextBox.Text != "")
             {
-                if (CenteredMessageBox.Show(string.Format($"Are you sure you want to add {departmentTextBox.Text}?"),
+                if (CenteredMessageBox.Show(string.Format($"Are you sure you want to add {areaTextBox.Text}?"),
                     "Deletion Dialog", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    Department = departmentTextBox.Text;
+                    Area = areaTextBox.Text;
                     DialogResult = DialogResult.Yes;
                     Close();
                 }
             }
             else
             {
-                CenteredMessageBox.Show("Please type a department to add.", "Error", MessageBoxButtons.OK);
+                CenteredMessageBox.Show("Please type a Area to add.", "Error", MessageBoxButtons.OK);
             }
         }
     }
