@@ -34,6 +34,8 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.fileTool = new System.Windows.Forms.ToolStripDropDownButton();
+            this.fileSaveTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileSaveExcelTool = new System.Windows.Forms.ToolStripMenuItem();
             this.fileClearTool = new System.Windows.Forms.ToolStripMenuItem();
             this.fileClearTimeSheeets = new System.Windows.Forms.ToolStripMenuItem();
             this.editTool = new System.Windows.Forms.ToolStripDropDownButton();
@@ -42,8 +44,8 @@
             this.editAreaEditTool = new System.Windows.Forms.ToolStripMenuItem();
             this.editAreaRemoveTool = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.fileSaveTool = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileSaveExcelTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.editSettingsTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.editSettingsExcel = new System.Windows.Forms.ToolStripMenuItem();
             this.shiftTimes.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -57,7 +59,7 @@
             this.shiftTimes.Controls.Add(this.tabPage2);
             this.shiftTimes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.shiftTimes.Location = new System.Drawing.Point(0, 0);
-            this.shiftTimes.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.shiftTimes.Margin = new System.Windows.Forms.Padding(2);
             this.shiftTimes.Name = "shiftTimes";
             this.shiftTimes.SelectedIndex = 0;
             this.shiftTimes.Size = new System.Drawing.Size(388, 337);
@@ -66,9 +68,9 @@
             // tabPage1
             // 
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(2);
             this.tabPage1.Size = new System.Drawing.Size(380, 311);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Day";
@@ -77,10 +79,10 @@
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.tabPage2.Size = new System.Drawing.Size(380, 316);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPage2.Size = new System.Drawing.Size(380, 311);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Mid";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -113,18 +115,33 @@
             this.fileTool.Size = new System.Drawing.Size(38, 22);
             this.fileTool.Text = "File";
             // 
+            // fileSaveTool
+            // 
+            this.fileSaveTool.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileSaveExcelTool});
+            this.fileSaveTool.Name = "fileSaveTool";
+            this.fileSaveTool.Size = new System.Drawing.Size(101, 22);
+            this.fileSaveTool.Text = "Save";
+            // 
+            // fileSaveExcelTool
+            // 
+            this.fileSaveExcelTool.Name = "fileSaveExcelTool";
+            this.fileSaveExcelTool.Size = new System.Drawing.Size(100, 22);
+            this.fileSaveExcelTool.Text = "Excel";
+            this.fileSaveExcelTool.Click += new System.EventHandler(this.fileSaveExcelTool_Click);
+            // 
             // fileClearTool
             // 
             this.fileClearTool.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileClearTimeSheeets});
             this.fileClearTool.Name = "fileClearTool";
-            this.fileClearTool.Size = new System.Drawing.Size(152, 22);
+            this.fileClearTool.Size = new System.Drawing.Size(101, 22);
             this.fileClearTool.Text = "Clear";
             // 
             // fileClearTimeSheeets
             // 
             this.fileClearTimeSheeets.Name = "fileClearTimeSheeets";
-            this.fileClearTimeSheeets.Size = new System.Drawing.Size(152, 22);
+            this.fileClearTimeSheeets.Size = new System.Drawing.Size(135, 22);
             this.fileClearTimeSheeets.Text = "TimeSheets";
             this.fileClearTimeSheeets.Click += new System.EventHandler(this.ClearTimeSheets_Click);
             // 
@@ -132,7 +149,8 @@
             // 
             this.editTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editTool.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editAreaTool});
+            this.editAreaTool,
+            this.editSettingsTool});
             this.editTool.Image = ((System.Drawing.Image)(resources.GetObject("editTool.Image")));
             this.editTool.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.editTool.Name = "editTool";
@@ -152,21 +170,21 @@
             // editAreaAddTool
             // 
             this.editAreaAddTool.Name = "editAreaAddTool";
-            this.editAreaAddTool.Size = new System.Drawing.Size(117, 22);
+            this.editAreaAddTool.Size = new System.Drawing.Size(152, 22);
             this.editAreaAddTool.Text = "Add";
             this.editAreaAddTool.Click += new System.EventHandler(this.AddTool_Click);
             // 
             // editAreaEditTool
             // 
             this.editAreaEditTool.Name = "editAreaEditTool";
-            this.editAreaEditTool.Size = new System.Drawing.Size(117, 22);
+            this.editAreaEditTool.Size = new System.Drawing.Size(152, 22);
             this.editAreaEditTool.Text = "Edit";
             this.editAreaEditTool.Click += new System.EventHandler(this.EditTool_Click);
             // 
             // editAreaRemoveTool
             // 
             this.editAreaRemoveTool.Name = "editAreaRemoveTool";
-            this.editAreaRemoveTool.Size = new System.Drawing.Size(117, 22);
+            this.editAreaRemoveTool.Size = new System.Drawing.Size(152, 22);
             this.editAreaRemoveTool.Text = "Remove";
             this.editAreaRemoveTool.Click += new System.EventHandler(this.RemoveTool_Click);
             // 
@@ -176,11 +194,11 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.shiftTimes);
-            this.toolStripContainer1.ContentPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.toolStripContainer1.ContentPanel.Margin = new System.Windows.Forms.Padding(2);
             this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(388, 337);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
-            this.toolStripContainer1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.toolStripContainer1.Margin = new System.Windows.Forms.Padding(2);
             this.toolStripContainer1.Name = "toolStripContainer1";
             this.toolStripContainer1.Size = new System.Drawing.Size(388, 362);
             this.toolStripContainer1.TabIndex = 4;
@@ -190,20 +208,20 @@
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
-            // fileSaveTool
+            // editSettingsTool
             // 
-            this.fileSaveTool.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileSaveExcelTool});
-            this.fileSaveTool.Name = "fileSaveTool";
-            this.fileSaveTool.Size = new System.Drawing.Size(152, 22);
-            this.fileSaveTool.Text = "Save";
+            this.editSettingsTool.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editSettingsExcel});
+            this.editSettingsTool.Name = "editSettingsTool";
+            this.editSettingsTool.Size = new System.Drawing.Size(152, 22);
+            this.editSettingsTool.Text = "Settings";
             // 
-            // fileSaveExcelTool
+            // editSettingsExcel
             // 
-            this.fileSaveExcelTool.Name = "fileSaveExcelTool";
-            this.fileSaveExcelTool.Size = new System.Drawing.Size(152, 22);
-            this.fileSaveExcelTool.Text = "Excel";
-            this.fileSaveExcelTool.Click += new System.EventHandler(this.fileSaveExcelTool_Click);
+            this.editSettingsExcel.Name = "editSettingsExcel";
+            this.editSettingsExcel.Size = new System.Drawing.Size(176, 22);
+            this.editSettingsExcel.Text = "Excel Save Location";
+            this.editSettingsExcel.Click += new System.EventHandler(this.editSettingsExcel_Click);
             // 
             // SixFlagsTracker
             // 
@@ -211,7 +229,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(388, 362);
             this.Controls.Add(this.toolStripContainer1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MinimumSize = new System.Drawing.Size(304, 332);
             this.Name = "SixFlagsTracker";
             this.Text = "Base Tracker";
@@ -244,6 +262,8 @@
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStripMenuItem fileSaveTool;
         private System.Windows.Forms.ToolStripMenuItem fileSaveExcelTool;
+        private System.Windows.Forms.ToolStripMenuItem editSettingsTool;
+        private System.Windows.Forms.ToolStripMenuItem editSettingsExcel;
     }
 }
 

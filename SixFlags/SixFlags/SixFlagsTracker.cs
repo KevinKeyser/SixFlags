@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Office.Interop.Excel;
-using Button = System.Windows.Forms.Button;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+
 
 namespace SixFlags
 {
@@ -30,6 +34,7 @@ namespace SixFlags
             {
                 document = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
                     new XElement("SavedData",
+                        new XElement("SaveLocation", new XAttribute("value", Environment.CurrentDirectory)),
                         new XElement("Areas"),
                         new XElement("Names")));
                 document.Save(SavedDataFile);
@@ -349,87 +354,291 @@ namespace SixFlags
 
         private void fileSaveExcelTool_Click(object sender, EventArgs e)
         {
-            Microsoft.Office.Interop.Excel.Application xlApplication = new Microsoft.Office.Interop.Excel.Application();
+            SpreadsheetDocument document = SpreadsheetDocument.Open( "SixFlagsTemplate.xlsx", true);
 
-
-            if (xlApplication == null)
-            {
-                CenteredMessageBox.Show(
-                    "EXCEL could not be started. Check that your office installation and project references are correct.",
-                    "Error", MessageBoxButtons.OK);
-                return;
-            }
-
-            Microsoft.Office.Interop.Excel.Workbook workbook = xlApplication.Workbooks.Open(Environment.CurrentDirectory + @"\SixFlagsTemplate.xlsx");
-
-            Microsoft.Office.Interop.Excel.Worksheet excelWorksheet = (Microsoft.Office.Interop.Excel.Worksheet)xlApplication.Sheets.get_Item("Security Day Shift Plan");
-
-
-            Microsoft.Office.Interop.Excel.Range range = xlApplication.Range["A1", "R68"];
             foreach (TabPage tabPage in shiftTimes.TabPages)
             {
                 ShiftTracker tracker = (ShiftTracker)tabPage.Controls[0];
+                string title = tabPage.Text == "Mid" ? "Night" : "Day";
+                WorksheetPart worksheet = GetWorksheetPartByName(document, $"Security {title} Shift Plan");
+                SheetData sheetData = worksheet.Worksheet.Elements<SheetData>().First();
                 foreach (string area in tracker.Areas.Keys)
                 {
-                    Microsoft.Office.Interop.Excel.Range curentCell = null;
 
                     bool findByIndex = true;
-                    curentCell = range.Find(area);
-                    if (curentCell != null)
+                    Cell currentCell = FindCellByValue(document, sheetData, area);
+                    if (currentCell != null)
                     {
                         findByIndex = false;
                     }
-                    Microsoft.Office.Interop.Excel.Range original = curentCell;
 
                     for (int i = 0, j = 0; i < tracker.Areas[area].timeSheets.Count; i++)
                     {
                         TimeSheet timeSheet = tracker.Areas[area].timeSheets[i];
                         if (findByIndex)
                         {
-                            curentCell = range.Find($"{area} {i + 1}");
+                            currentCell = FindCellByValue(document, sheetData, $"{area} {i + 1}");
                         }
                         else
                         {
                             if (i > 0)
                             {
-                                curentCell = range.FindNext(original);
-                                original = curentCell;
+                                string row = Regex.Match(currentCell.CellReference, @"\d+").Value;
+                                string column = Regex.Match(currentCell.CellReference, @"\D+").Value;
+
+                                currentCell = GetCell(sheetData, column.Remove(column.Length - 1, 1) + (char)(column[column.Length - 1] + 1) + row);
                             }
                         }
-                        if (curentCell != null)
+                        if (currentCell != null)
                         {
-                            curentCell = curentCell.Next;
-                            curentCell.Value2 = timeSheet.Name;
-                            curentCell = curentCell.Next;
-                            curentCell = curentCell.Next;
+                            currentCell = nextColumn(sheetData, currentCell);
+                            currentCell.CellValue = new CellValue(
+                                InsertSharedStringItem(timeSheet.Name, document.WorkbookPart.SharedStringTablePart).ToString());
+                            currentCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+                            currentCell = nextColumn(sheetData, currentCell);
+                            currentCell = nextColumn(sheetData, currentCell);
                             for (int ii = 0; ii < 2; ii++)
                             {
                                 if (timeSheet.SentBreak.Count > ii)
                                 {
-                                    curentCell.NumberFormat = "hh:mm:ss";
-                                    curentCell.Value2 = timeSheet.SentBreak[ii].TimeOfDay.ToString();
+                                    currentCell.CellValue = new CellValue(timeSheet.SentBreak[ii].ToString("HH:mm:ss"));
+                                    currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
                                 }
 
-                                curentCell = curentCell.Next;
+                                currentCell = nextColumn(sheetData, currentCell);
                                 if (timeSheet.SentLunch.Count > ii)
                                 {
-                                    curentCell.NumberFormat = "hh:mm:ss";
-                                    curentCell.Value2 = timeSheet.SentLunch[ii].TimeOfDay.ToString();
+                                    currentCell.CellValue = new CellValue(timeSheet.SentLunch[ii].ToString("HH:mm:ss"));
+                                    currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
                                 }
-                                curentCell = curentCell.Next;
+                                currentCell = nextColumn(sheetData, currentCell);
                             }
                             if (timeSheet.SentBreak.Count > 2)
                             {
-                                curentCell.NumberFormat = "hh:mm:ss";
-                                curentCell.Value2 = timeSheet.SentBreak[2].TimeOfDay.ToString();
+                                currentCell.CellValue = new CellValue(timeSheet.SentBreak[2].ToString("HH:mm:ss"));
+                                currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
+                            }
+                        }
+                    }
+                    for (int i = 0, j = 0; i < tracker.Areas[area].EndedTimeSheets.Count; i++)
+                    {
+                        TimeSheet timeSheet = tracker.Areas[area].EndedTimeSheets[i];
+                        if (findByIndex)
+                        {
+                            currentCell = FindCellByValue(document, sheetData, $"{area} {i + 1}");
+                        }
+                        else
+                        {
+                            if (i > 0)
+                            {
+                                string row = Regex.Match(currentCell.CellReference, @"\d+").Value;
+                                string column = Regex.Match(currentCell.CellReference, @"\D+").Value;
+
+                                currentCell = GetCell(sheetData, column.Remove(column.Length - 1, 1) + (char)(column[column.Length - 1] + 1) + row);
+                            }
+                        }
+                        if (currentCell != null)
+                        {
+                            currentCell = nextColumn(sheetData, currentCell);
+                            currentCell.CellValue = new CellValue(
+                                InsertSharedStringItem(timeSheet.Name, document.WorkbookPart.SharedStringTablePart).ToString());
+                            currentCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+                            currentCell = nextColumn(sheetData, currentCell);
+                            currentCell = nextColumn(sheetData, currentCell);
+                            for (int ii = 0; ii < 2; ii++)
+                            {
+                                if (timeSheet.SentBreak.Count > ii)
+                                {
+                                    currentCell.CellValue = new CellValue(timeSheet.SentBreak[ii].ToString("HH:mm:ss"));
+                                    currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
+                                }
+
+                                currentCell = nextColumn(sheetData, currentCell);
+                                if (timeSheet.SentLunch.Count > ii)
+                                {
+                                    currentCell.CellValue = new CellValue(timeSheet.SentLunch[ii].ToString("HH:mm:ss"));
+                                    currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
+                                }
+                                currentCell = nextColumn(sheetData, currentCell);
+                            }
+                            if (timeSheet.SentBreak.Count > 2)
+                            {
+                                currentCell.CellValue = new CellValue(timeSheet.SentBreak[2].ToString("HH:mm:ss"));
+                                currentCell.DataType = new EnumValue<CellValues>(CellValues.String);
                             }
                         }
                     }
                 }
+                worksheet.Worksheet.Save();
             }
-            xlApplication.DisplayAlerts = false;
-            workbook.SaveAs(Environment.CurrentDirectory + $@"/SixFlags{currentSelectedDate.Date.ToShortDateString().Replace("/", "_")}.xlsx");
-            workbook.Close();
+
+
+            var xmlDocument = XDocument.Load(SavedDataFile);
+
+            string path = xmlDocument.XPathSelectElements("SavedData/SaveLocation").Attributes("value").First().Value;
+            path = path == "" ? Environment.CurrentDirectory : path;
+            SpreadsheetDocument newDoc = SpreadsheetDocument.Create($"{path}/SixFlags_{currentSelectedDate.Date.ToShortDateString().Replace("/", "_")}.xlsx", SpreadsheetDocumentType.Workbook);
+            
+            newDoc.DeleteParts<OpenXmlPart>(newDoc.GetPartsOfType<OpenXmlPart>());
+
+            foreach (OpenXmlPart part in document.GetPartsOfType<OpenXmlPart>())
+            {
+                OpenXmlPart newPart = newDoc.AddPart<OpenXmlPart>(part);
+            }
+
+            newDoc.Save();
+            newDoc.Close();
+            document.Close();
+            
+
+        }
+
+        private Cell nextColumn(SheetData sheetData, Cell cell)
+        {
+            string row = Regex.Match(cell.CellReference, @"\d+").Value;
+            string column = Regex.Match(cell.CellReference, @"\D+").Value;
+
+            return GetCell(sheetData, column.Remove(column.Length - 1, 1) + (char)(column[column.Length - 1] + 1) + row);
+        }
+
+        private Cell nextRow(SheetData sheetData, Cell cell)
+        {
+            string row = Regex.Match(cell.CellReference, @"\d+").Value;
+            string column = Regex.Match(cell.CellReference, @"\D+").Value;
+
+            return GetCell(sheetData, column + (row + 1));
+        }
+
+        private Cell GetCell(SheetData sheetData, string cellAddress)
+        {
+            uint rowIndex = uint.Parse(Regex.Match(cellAddress, @"[0-9]+").Value);
+            return sheetData.Descendants<Row>().FirstOrDefault(p => p.RowIndex == rowIndex).Descendants<Cell>().FirstOrDefault(p => p.CellReference == cellAddress);
+        }
+
+        private int InsertSharedStringItem(string text, SharedStringTablePart shareStringPart)
+        {
+            // If the part does not contain a SharedStringTable, create one.
+            if (shareStringPart.SharedStringTable == null)
+            {
+                shareStringPart.SharedStringTable = new SharedStringTable();
+            }
+
+            int i = 0;
+
+            // Iterate through all the items in the SharedStringTable. If the text already exists, return its index.
+            foreach (SharedStringItem item in shareStringPart.SharedStringTable.Elements<SharedStringItem>())
+            {
+                if (item.InnerText == text)
+                {
+                    return i;
+                }
+
+                i++;
+            }
+
+            // The text does not exist in the part. Create the SharedStringItem and return its index.
+            shareStringPart.SharedStringTable.AppendChild(new SharedStringItem(new Text(text)));
+            shareStringPart.SharedStringTable.Save();
+
+            return i;
+        }
+
+        private WorksheetPart GetWorksheetPartByName(SpreadsheetDocument document, string sheetName)
+        {
+            IEnumerable<Sheet> sheets =
+               document.WorkbookPart.Workbook.GetFirstChild<Sheets>().
+               Elements<Sheet>().Where(s => s.Name == sheetName);
+            
+            
+            if (sheets.Count() == 0)
+            {
+                // The specified worksheet does not exist.
+
+                return null;
+            }
+
+            string relationshipId = sheets.First().Id.Value;
+            WorksheetPart worksheetPart = (WorksheetPart)
+                 document.WorkbookPart.GetPartById(relationshipId);
+            return worksheetPart;
+
+        }
+
+        private Cell FindCellByValue(SpreadsheetDocument document, SheetData sheetData, string value)
+        {
+            var values = document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ToArray();
+
+
+            foreach (Row row in sheetData.Elements<Row>())
+            {
+                foreach (Cell cell in row.Elements<Cell>())
+                {
+                    if (cell.DataType != null)
+                    {
+                        switch (cell.DataType.Value)
+                        {
+                            case CellValues.String:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.Boolean:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.Date:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.SharedString:
+                                if (values[int.Parse(cell.CellValue.Text)].InnerText == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.InlineString:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.Number:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                            case CellValues.Error:
+                                if (cell.CellValue.Text == value)
+                                {
+                                    return cell;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void editSettingsExcel_Click(object sender, EventArgs e)
+        {
+            var document = XDocument.Load(SavedDataFile);
+
+            string path = document.XPathSelectElements("SavedData/SaveLocation").Attributes("value").First().Value;
+
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.SelectedPath = path;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                document.XPathSelectElements("SavedData/SaveLocation").Attributes("value").First().Value = dialog.SelectedPath;
+                document.Save(SavedDataFile);
+            }
         }
     }
 }

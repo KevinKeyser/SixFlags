@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?> 
  <SavedData>
+   <SaveLocation value=""/>
     <Areas>
       <Area name="Mobile" />
       <Area name="Ped Gate" />
-      <Area name="1" />
-      <Area name="2" />
+      <Area name="Metals" />
     </Areas>
     <Names>
     </Names>

@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -184,6 +184,7 @@
     <EmbeddedResource Include="TimeSheetAdder.resx">
       <DependentUpon>TimeSheetAdder.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -202,10 +203,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SavedData.xml" />
+    <Content Include="SavedData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Times.txt" />
     <Content Include="TimeSheets.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +252,16 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Open-XML-SDK-vNext\DocumentFormat.OpenXml\DocumentFormat.OpenXml.csproj">
+      <Project>{E5D39C6A-9067-477E-B0D3-A9419B86E6E5}</Project>
+      <Name>DocumentFormat.OpenXml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Open-XML-SDK-vNext\System.IO.Packaging\System.IO.Packaging.csproj">
+      <Project>{4c88a3ad-1241-4a04-854b-8372df29828d}</Project>
+      <Name>System.IO.Packaging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,2 +1,6 @@
 SixFlags/SixFlags/bin/
 SixFlags/SixFlags/obj/
+Open-XML-SDK-vNext/DocumentFormat.OpenXml/bin
+Open-XML-SDK-vNext/DocumentFormat.OpenXml/obj
+Open-XML-SDK-vNext/System.IO.Packaging/bin
+Open-XML-SDK-vNext/System.IO.Packaging/obj
